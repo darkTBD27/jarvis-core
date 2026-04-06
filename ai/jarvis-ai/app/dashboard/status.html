@@ -1,0 +1,318 @@
+<html>
+
+<head>
+
+<title>Jarvis Core</title>
+
+<style>
+
+body{
+background:#0b0f14;
+color:#00ff9c;
+font-family:monospace;
+padding:20px;
+}
+
+.box{
+border:1px solid #00ff9c;
+padding:12px;
+margin-bottom:12px;
+width:420px;
+}
+
+.grid{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+}
+
+.title{
+color:#00ffaa;
+margin-bottom:6px;
+}
+
+button{
+background:#0b0f14;
+color:#00ffaa;
+border:1px solid #00ffaa;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>JARVIS CORE RUNTIME</h2>
+
+<div class="grid">
+
+<div id="runtime"></div>
+<div id="active"></div>
+<div id="performance"></div>
+<div id="health"></div>
+<div id="runtime_events"></div>
+<div id="history"></div>
+
+</div>
+
+<script>
+
+let dashboardLoop = null;
+
+async function load(){
+
+try{
+
+let r = await fetch("/status");
+
+if(!r.ok){
+throw new Error("Status request failed");
+}
+
+let d = await r.json();
+
+let e = d.inference?.engine || {};
+
+let last = e.last_request || {};
+
+
+// RUNTIME
+
+document.getElementById("runtime").innerHTML=
+
+"<div class='box'>"+
+
+"<div class='title'>RUNTIME</div>"+
+
+"READY: "+(d.ready ?? false)+"<br>"+
+
+"STATE: "+(e.jarvis?.state ?? "unknown")+"<br>"+
+
+"UPTIME: "+(e.jarvis?.uptime ?? 0)+"<br>"+
+
+"BUSY: "+(e.busy ?? false)+"<br>"+
+
+"WORKER: "+(e.worker_status ?? "unknown")+"<br>"+
+
+"HEARTBEAT: "+(e.worker_heartbeat_age ?? 0).toFixed(1)+"s<br>"+
+
+"LAST ACTIVITY: "+(e.worker_last_activity_age ?? 0).toFixed(1)+"s<br>"+
+
+"QUEUE: "+(e.queue ?? 0)+"/"+(e.queue_limit ?? 0)+"<br>"+
+
+"LAST TOOL: "+(e.last_tool ?? "none")+"<br>"+
+
+"</div>";
+
+
+// ACTIVE
+
+let queue_html="";
+
+let queued = e.queued_requests || [];
+
+queued.forEach(q=>{
+
+queue_html +=
+q+
+" <button onclick=\"cancelRequest('"+q+"')\">cancel</button>"+
+"<br>";
+
+});
+
+let cancel_btn="";
+
+if(e.current_request){
+
+cancel_btn=
+" <button onclick=\"cancelRequest('"+e.current_request+"')\">cancel</button>";
+
+}
+
+document.getElementById("active").innerHTML=
+
+"<div class='box'>"+
+
+"<div class='title'>ACTIVE</div>"+
+
+"CURRENT: "+(e.current_request || "none")+
+cancel_btn+
+
+"<br>"+
+
+"LAST: "+(last?.request_id || "none")+"<br>"+
+
+"STATUS: "+(last?.status || "none")+"<br>"+
+
+"DURATION: "+(last?.duration || 0)+"<br>"+
+
+"<br>QUEUE:<br>"+
+
+(queue_html || "empty")+
+
+"</div>";
+
+
+// PERFORMANCE
+
+document.getElementById("performance").innerHTML=
+
+"<div class='box'>"+
+
+"<div class='title'>PERFORMANCE</div>"+
+
+"TOKENS/SEC: "+(e.tokens_per_sec ?? 0)+"<br>"+
+
+"LAST TIME: "+(e.last_duration ?? 0)+"<br>"+
+
+"AVG TIME: "+(e.avg_duration ?? 0)+"<br>"+
+
+"TOTAL REQUESTS: "+(e.total_requests ?? 0)+"<br>"+
+
+"SLOW REQUESTS: "+(e.slow_requests ?? 0)+"<br>"+
+
+"</div>";
+
+
+// HEALTH
+
+let error_types = e.error_types || {};
+
+let error_html = "";
+
+Object.entries(error_types).forEach(([k,v])=>{
+
+error_html += k+": "+v+"<br>";
+
+});
+
+document.getElementById("health").innerHTML=
+
+"<div class='box'>"+
+
+"<div class='title'>HEALTH</div>"+
+
+"ERRORS: "+(e.errors ?? 0)+"<br>"+
+
+"TIMEOUTS: "+(e.timeouts ?? 0)+"<br>"+
+
+"SUCCESS: "+(e.success_requests ?? 0)+"<br>"+
+
+"SLOW: "+(e.slow_requests ?? 0)+"<br>"+
+
+"LAST SUCCESS: "+(e.last_success_request ?? "none")+"<br>"+
+
+"LAST ERROR: "+(e.last_error ?? "none")+"<br>"+
+
+"ERROR TYPES:<br>"+(error_html || "none")+"<br>"+
+
+"LAST EVENT: "+(e.last_event ?? "none")+"<br>"+
+
+"</div>";
+
+
+// RUNTIME EVENTS
+
+let events = e.runtime_events || [];
+
+let event_html = "";
+
+events.slice().reverse().forEach(ev=>{
+
+event_html += ev.type+"<br>";
+
+});
+
+document.getElementById("runtime_events").innerHTML=
+
+"<div class='box'>"+
+
+"<div class='title'>RUNTIME EVENTS</div>"+
+
+(event_html || "none")+
+
+"</div>";
+
+
+// HISTORY
+
+let history = e.history || [];
+
+let history_html=
+
+"<div class='box'>"+
+
+"<div class='title'>REQUEST HISTORY</div>";
+
+history.slice(-15).reverse().forEach(r=>{
+
+let err="";
+
+if(r.error && r.error!="None"){
+err=" | "+r.error;
+}
+
+history_html+=
+
+"ID: "+r.request_id+
+" | "+r.status+
+" | "+r.duration+"s"+
+" | "+r.tokens+" tok"+
+" | "+r.tokens_per_sec+" t/s"+
+err+
+"<br>";
+
+});
+
+history_html+="</div>";
+
+document.getElementById("history").innerHTML=history_html;
+
+}
+
+catch(err){
+
+console.error("Dashboard load failed:",err);
+
+if(dashboardLoop){
+clearInterval(dashboardLoop);
+dashboardLoop=null;
+}
+
+document.body.innerHTML +=
+"<div style='color:red'>DASHBOARD ERROR — AUTO REFRESH STOPPED</div>";
+
+}
+
+}
+
+
+function startLoop(){
+
+if(dashboardLoop){
+clearInterval(dashboardLoop);
+}
+
+dashboardLoop=setInterval(load,1000);
+
+}
+
+
+load().then(startLoop);
+
+
+async function cancelRequest(id){
+
+await fetch("/cancel?request_id="+id,{
+method:"POST"
+});
+
+}
+
+</script>
+
+</body>
+
+</html>

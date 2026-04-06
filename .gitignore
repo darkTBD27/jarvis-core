@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual env
+venv/
+.env
+*.env
+
+# AI Models
+models/
+*.gguf
+*.bin
+*.pt
+*.safetensors
+
+# Runtime Data
+memory/**/data/
+memory/**/cache/
+memory/**/logs/
+
+# Docker
+docker-data/
+volumes/
+*.tar
+
+# Logs
+logs/
+*.log
+
+# Databases
+*.db
+*.sqlite
+
+# Build
+build/
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Node (falls dashboard mal wächst)
+node_modules/
+
+# Cache
+.cache/
+
+# Temp
+tmp/
+temp/

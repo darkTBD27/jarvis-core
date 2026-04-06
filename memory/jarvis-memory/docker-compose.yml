@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+
+  jarvis-memory:
+
+    image: postgres:16
+
+    container_name: jarvis-memory
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    volumes:
+      - ./data:/var/lib/postgresql/data
+      - ./logs:/logs
+      - ./init:/docker-entrypoint-initdb.d
+
+    networks:
+      - jarvis-network
+
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U jarvis"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+
+  jarvis-network:
+    external: true

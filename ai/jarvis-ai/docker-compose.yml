@@ -1,0 +1,37 @@
+services:
+
+  jarvis-ai:
+
+    build: .
+
+    container_name: jarvis-ai
+
+    restart: unless-stopped
+    
+    runtime: nvidia
+
+    env_file:
+      - .env
+
+    ports:
+      - "8002:8000"
+      
+    volumes:
+      - ./models:/models
+      - ./app:/app
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+    networks:
+      - jarvis-network
+
+networks:
+
+  jarvis-network:
+    external: true

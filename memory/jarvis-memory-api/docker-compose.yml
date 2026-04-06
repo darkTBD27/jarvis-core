@@ -1,0 +1,23 @@
+services:
+
+  jarvis-memory-api:
+
+    build: .
+
+    container_name: jarvis-memory-api
+
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    ports:
+      - "8001:8000"
+
+    networks:
+      - jarvis-network
+
+networks:
+
+  jarvis-network:
+    external: true
