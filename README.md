@@ -291,3 +291,17 @@ Runtime Foundation erreicht.
 Nächster Meilenstein:
 
 Runtime Error Intelligence Layer.
+
+# Usage
+
+This repository is currently source-visible only.
+
+Purpose:
+
+Architecture documentation
+Learning reference
+Development history
+
+Not intended for production use or redistribution.
+
+License may be added in future versions.

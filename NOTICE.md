@@ -19,4 +19,6 @@ Until an official license is added.
 
 All rights reserved.
 
+Copyright (c) 2026 darkTDB27
+
 This repository documents the development of Jarvis Core architecture.
