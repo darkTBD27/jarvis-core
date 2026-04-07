@@ -9,9 +9,41 @@ Dieses Projekt ist kein Chatbot, sondern eine Runtime Engine für AI Execution.
 
 ---
 
+# Runtime Status
+
+Runtime Core: Stable
+Error Intelligence: Stable
+Observability: Stable
+Architecture: Stabilized
+
+Current Phase:
+
+Phase 4 – Error Intelligence Layer ✔
+
+Next Phase:
+
+Phase 5 – Runtime Intelligence Layer
+
+Project Direction:
+
+Jarvis entwickelt sich zu einem deterministischen AI Runtime System
+mit Fokus auf Stabilität, Transparenz und kontrollierte Execution.
+
+Nicht Ziel:
+
+Autonomous Agents
+Self modifying AI
+Unkontrollierte AI Behaviour
+
+Ziel:
+
+Runtime Infrastruktur.
+
+---
+
 # Release Status
 
-Release: 0.1 – Runtime Foundation
+Release: 0.2 – Runtime Hardening
 
 Aktueller Stand:
 
@@ -19,11 +51,13 @@ Stable Runtime Core
 Health Monitoring vorhanden
 Runtime Events vorhanden
 Error Tracking vorhanden
+Error Intelligence vorhanden
+Runtime Hardening abgeschlossen
 Dashboard vorhanden
 
 Nächster Schritt:
 
-Phase 4 – Runtime Error Intelligence
+Phase 5 – Runtime Intelligence Layer
 
 ---
 
@@ -33,16 +67,17 @@ Jarvis Core soll eine stabile AI Runtime Infrastruktur werden.
 
 Fokus:
 
-Deterministische Execution  
-Runtime Observability  
-Health Intelligence  
-Execution Control  
+Deterministische Execution
+Runtime Observability
+Health Intelligence
+Execution Control
+System Stability
 
 Nicht Fokus:
 
-Agent Behaviour  
-Autonomous AI  
-Self modifying Systems  
+Agent Behaviour
+Autonomous AI
+Self modifying Systems
 
 Jarvis soll Infrastruktur sein.
 
@@ -52,21 +87,29 @@ Jarvis soll Infrastruktur sein.
 
 Jarvis folgt einer klaren Schichtenarchitektur:
 
-API Layer  
-Service Layer  
-Runtime Layer  
-Worker Loop  
-Inference Engine  
+API Layer
+Service Layer
+Runtime Layer
+Worker Loop
+Inference Engine
 
 Execution Flow:
 
-Request  
-→ Queue  
-→ Worker  
-→ Runtime Update  
-→ Metrics  
-→ History  
+Request
+→ Queue
+→ Worker
+→ Runtime Update
+→ Metrics
+→ History
 → Idle
+
+Runtime Feedback Flow:
+
+Worker
+→ Error Intelligence
+→ Health Evaluation
+→ Status Service
+→ Dashboard
 
 ---
 
@@ -74,30 +117,30 @@ Request
 
 Runtime Core:
 
-RuntimeState  
-RuntimeWorker  
-RuntimeHealth  
-RuntimeErrors  
-RuntimeAutomation  
+RuntimeState
+RuntimeWorker
+RuntimeHealth
+RuntimeErrors
+RuntimeAutomation
 
 Execution:
 
-Inference Engine  
-Queue System  
-Reasoning Engine  
+Inference Engine
+Queue System
+Reasoning Engine
 
 Observability:
 
-Metrics  
-Runtime Events  
-Health System  
-Dashboard  
+Metrics
+Runtime Events
+Health System
+Dashboard
 
 Control:
 
-Status Service  
-Runtime Service  
-Inference Service  
+Status Service
+Runtime Service
+Inference Service
 
 ---
 
@@ -105,10 +148,12 @@ Inference Service
 
 Jarvis folgt festen Engineering Prinzipien:
 
-Stabilität vor Geschwindigkeit  
-Observability vor Magie  
-Determinismus vor Zufall  
-Architektur vor Features  
+Stabilität vor Geschwindigkeit
+Observability vor Magie
+Determinismus vor Zufall
+Architektur vor Features
+Single Source of Truth
+Klare Ownership von State
 
 Jarvis soll erklärbar bleiben.
 
@@ -118,20 +163,21 @@ Jarvis soll erklärbar bleiben.
 
 Health basiert auf:
 
-Error Rate  
-Timeout Rate  
-Queue Pressure  
-Worker Status  
-Slow Requests  
+Error Rate
+Timeout Rate
+Queue Pressure
+Worker Status
+Slow Requests
+Error Categories
 
 Health States:
 
-healthy  
-busy  
-degraded  
-error  
+healthy
+busy
+degraded
+error
 
-Health ist berechneter Zustand.
+Health ist ein berechneter Zustand.
 Nicht manuell gesetzt.
 
 ---
@@ -145,6 +191,7 @@ Worker Status
 Queue State
 Performance Metrics
 Errors
+Error Intelligence
 Runtime Events
 Request History
 
@@ -158,11 +205,13 @@ Runtime jederzeit verstehen können ohne Logs lesen zu müssen.
 
 Jarvis speichert wichtige Runtime Aktionen:
 
-request_started  
-request_finished  
-request_error  
-health_change  
-worker_stall  
+request_started
+request_finished
+request_error
+health_change
+worker_stall
+error_spike
+critical_error
 
 Das bildet die Grundlage für spätere Runtime Intelligence.
 
@@ -170,13 +219,14 @@ Das bildet die Grundlage für spätere Runtime Intelligence.
 
 # Aktuelle Features
 
-Runtime Worker Loop  
-Health Monitoring  
-Error Tracking  
-Metrics System  
-Runtime Events  
-Dashboard  
-Docker Setup  
+Runtime Worker Loop
+Health Monitoring
+Error Tracking
+Error Intelligence
+Metrics System
+Runtime Events
+Dashboard
+Docker Setup
 
 ---
 
@@ -187,13 +237,12 @@ jarvis-core/
 
 ai/jarvis-ai/app/
 
-engine/
+dashboard/
 inference/
 services/
-runtime/
-dashboard/
-
 memory/
+config/
+error/
 
 scripts/
 ```
@@ -204,9 +253,9 @@ scripts/
 
 Requirements:
 
-Docker  
-Docker Compose  
-Linux empfohlen  
+Docker
+Docker Compose
+Linux empfohlen
 
 Start:
 
@@ -232,10 +281,11 @@ http://localhost:8002/dashboard/status.html
 
 # Entwicklungsstatus
 
-Phase 1 – Execution Core ✔  
-Phase 2 – Observability ✔  
-Phase 3 – Runtime Intelligence Foundation ✔  
-Phase 4 – Error Intelligence (next)
+Phase 1 – Execution Core ✔
+Phase 2 – Observability ✔
+Phase 3 – Runtime Intelligence Foundation ✔
+Phase 4 – Error Intelligence ✔
+Phase 5 – Runtime Intelligence (next)
 
 ---
 
@@ -259,15 +309,16 @@ Ein autonomes System.
 
 Jarvis wird gebaut wie:
 
-Ein Runtime Kernel  
-Ein Scheduler  
-Eine Datenbank Engine  
+Ein Runtime Kernel
+Ein Scheduler
+Eine Datenbank Engine
+Ein Observability System
 
 Nicht wie:
 
-Ein Chatbot  
-Ein AI Experiment  
-Ein Spielzeug  
+Ein Chatbot
+Ein AI Experiment
+Ein Spielzeug
 
 ---
 
@@ -287,10 +338,13 @@ Nutzung nicht freigegeben.
 Jarvis Core:
 
 Runtime Foundation erreicht.
+Error Intelligence stabilisiert.
 
 Nächster Meilenstein:
 
-Runtime Error Intelligence Layer.
+Runtime Intelligence Layer.
+
+---
 
 # Usage
 
@@ -305,3 +359,4 @@ Development history
 Not intended for production use or redistribution.
 
 License may be added in future versions.
+
