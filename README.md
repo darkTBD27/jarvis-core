@@ -41,6 +41,12 @@ Runtime Infrastruktur.
 
 ---
 
+# Runtime Dashboard
+
+Jarvis Runtime Status Interface:
+
+![Jarvis Dashboard](docs/dashboard.png)
+
 # Release Status
 
 Release: 0.2 – Runtime Hardening
