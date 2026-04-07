@@ -121,6 +121,17 @@ Worker
 
 # Architecture Diagram
 
+Jarvis Runtime Flow:
+
+Client Request  
+→ Queue  
+→ Worker  
+→ Runtime State  
+→ Error Intelligence  
+→ Runtime Health  
+→ Status Service  
+→ Dashboard  
+
 Detailed runtime architecture:
 
 [Architecture Overview](docs/architecture.md)
