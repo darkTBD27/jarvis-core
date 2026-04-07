@@ -1,0 +1,44 @@
+from enum import Enum
+
+
+class ErrorCategory(Enum):
+
+    SYSTEM_ERROR = "SYSTEM_ERROR"
+
+    NETWORK_ERROR = "NETWORK_ERROR"
+
+    CONFIG_ERROR = "CONFIG_ERROR"
+
+    RUNTIME_ERROR = "RUNTIME_ERROR"
+
+    DEPENDENCY_ERROR = "DEPENDENCY_ERROR"
+
+    DATA_ERROR = "DATA_ERROR"
+
+    PERMISSION_ERROR = "PERMISSION_ERROR"
+
+    TIMEOUT_ERROR = "TIMEOUT_ERROR"
+
+    UNKNOWN = "UNKNOWN"
+
+
+class ErrorSeverity(Enum):
+
+    INFO = "INFO"
+
+    WARNING = "WARNING"
+
+    ERROR = "ERROR"
+
+    CRITICAL = "CRITICAL"
+
+    FATAL = "FATAL"
+
+
+class RetryPolicy(Enum):
+
+    RETRYABLE = "RETRYABLE"
+
+    NON_RETRYABLE = "NON_RETRYABLE"
+
+    CONDITIONAL = "CONDITIONAL"

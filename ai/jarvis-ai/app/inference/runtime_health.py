@@ -29,18 +29,30 @@ class HealthState(Enum):
 
 def _calculate_error_rate():
 
-    if metrics.REQUEST_COUNT == 0:
+    from inference.runtime_errors import get_error_history
+
+    total = metrics.REQUEST_COUNT
+
+    if total == 0:
         return 0.0
 
-    return metrics.ERROR_COUNT / metrics.REQUEST_COUNT
+    errors = len(get_error_history())
+
+    return errors / total
 
 
 def _calculate_timeout_rate():
 
-    if metrics.REQUEST_COUNT == 0:
+    from inference.runtime_errors import get_error_types
+
+    total = metrics.REQUEST_COUNT
+
+    if total == 0:
         return 0.0
 
-    return metrics.TIMEOUT_COUNT / metrics.REQUEST_COUNT
+    timeouts = get_error_types().get("TimeoutError",0)
+
+    return timeouts / total
 
 
 def has_recent_critical_error(seconds=120):
@@ -52,6 +64,14 @@ def has_recent_critical_error(seconds=120):
         if e.get("severity") == "critical":
 
             if now - e["time"] <= seconds:
+
+                return True
+
+            if e.get("category") == "CONFIG_ERROR":
+
+                return True
+
+            if e.get("category") == "DEPENDENCY_ERROR":
 
                 return True
 
@@ -94,6 +114,8 @@ def calculate_health():
 
     spike = is_error_spiking()
 
+    recent_categories = get_recent_error_categories()
+
     flapping = health_is_flapping(runtime)
 
 
@@ -110,6 +132,14 @@ def calculate_health():
         health = HealthState.DEGRADED
 
     elif error_rate > HEALTH_DEGRADED_ERROR_THRESHOLD:
+
+        health = HealthState.DEGRADED
+
+    elif recent_categories.get("CONFIG_ERROR",0) >= 2:
+
+        health = HealthState.ERROR
+
+    elif recent_categories.get("DEPENDENCY_ERROR",0) >= 2:
 
         health = HealthState.DEGRADED
 
@@ -199,3 +229,54 @@ def health_is_flapping(runtime, window=10):
             last = h["state"]
 
     return changes >= 4
+
+
+def has_error_category(category, seconds=120):
+
+    now = time.time()
+
+    for e in get_error_history():
+
+        if e.get("category") == category:
+
+            if now - e["time"] <= seconds:
+
+                return True
+
+    return False
+
+
+def get_recent_error_categories(seconds=120):
+
+    now = time.time()
+
+    categories = {}
+
+    for e in get_error_history():
+
+        if now - e["time"] <= seconds:
+
+            cat = e.get("category","UNKNOWN")
+
+            categories[cat] = categories.get(cat,0) + 1
+
+    return categories
+
+
+def get_error_intelligence():
+
+    categories = get_recent_error_categories()
+
+    return {
+
+        "recent_categories": categories,
+
+        "config_errors": categories.get("CONFIG_ERROR",0),
+
+        "dependency_errors": categories.get("DEPENDENCY_ERROR",0),
+
+        "network_errors": categories.get("NETWORK_ERROR",0),
+
+        "timeout_errors": categories.get("TIMEOUT_ERROR",0)
+
+    }

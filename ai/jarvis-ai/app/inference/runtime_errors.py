@@ -1,11 +1,19 @@
+from error.error_classifier import ErrorClassifier
+
 import time
 
+from threading import Lock
+
+
+classifier = ErrorClassifier()
 
 MAX_ERROR_HISTORY = 50
 
 ERROR_HISTORY = []
 
 ERROR_TYPES = {}
+
+ERROR_LOCK = Lock()
 
 ERROR_RETRY_COUNT = {}
 
@@ -43,11 +51,17 @@ def add_error(error_type, request_id=None):
 
     global LAST_ERROR_TYPE
 
+    classification = classifier.classify(error_type)
+
     entry = {
 
         "type": error_type,
 
         "severity": get_error_severity(error_type),
+
+        "category": classification["category"],
+
+        "retry_policy": classification["retry_policy"],
 
         "request_id": request_id,
 
@@ -57,11 +71,13 @@ def add_error(error_type, request_id=None):
 
     }
 
-    if len(ERROR_HISTORY) >= MAX_ERROR_HISTORY:
+    with ERROR_LOCK:
 
-        ERROR_HISTORY.pop(0)
+        if len(ERROR_HISTORY) >= MAX_ERROR_HISTORY:
 
-    ERROR_HISTORY.append(entry)
+            ERROR_HISTORY.pop(0)
+
+        ERROR_HISTORY.append(entry)
 
     if entry["severity"] == "critical":
 
@@ -83,9 +99,13 @@ def add_error(error_type, request_id=None):
 
     LAST_ERROR_TYPE = error_type
 
-    ERROR_TYPES[error_type] = ERROR_TYPES.get(error_type,0) + 1
+    with ERROR_LOCK:
+
+        ERROR_TYPES[error_type] = ERROR_TYPES.get(error_type,0) + 1
 
     if is_error_spiking():
+
+        recent_types = get_recent_error_types()
 
         now = time.time()
 
@@ -103,7 +123,9 @@ def add_error(error_type, request_id=None):
 
                     "type":error_type,
 
-                    "recent_errors":get_recent_error_count()
+                    "recent_errors":get_recent_error_count(60),
+
+                    "pattern":get_recent_error_types()
 
                 }
 
@@ -160,11 +182,31 @@ def get_recent_error_count(seconds=60):
     return count
 
 
-def is_error_spiking():
+def is_error_spiking(seconds=60, threshold=3):
 
-    recent = get_recent_error_count(60)
+    recent_types = get_recent_error_types(seconds)
 
-    if recent >= 3:
-        return True
+    for error_type, count in recent_types.items():
+
+        if count >= threshold:
+
+            return True
 
     return False
+
+
+def get_recent_error_types(seconds=60):
+
+    now = time.time()
+
+    types = {}
+
+    for e in ERROR_HISTORY:
+
+        if now - e["time"] <= seconds:
+
+            t = e["type"]
+
+            types[t] = types.get(t,0) + 1
+
+    return types

@@ -1,5 +1,7 @@
 import threading
 
+from memory.conversation_store import conversations
+
 
 MAX_MESSAGES = 20
 
@@ -10,8 +12,6 @@ class ConversationStore:
 
         self.lock = threading.Lock()
 
-        self.conversations = {}
-
 
     def add_message(self, conversation_id, role, content):
 
@@ -20,11 +20,11 @@ class ConversationStore:
 
         with self.lock:
 
-            if conversation_id not in self.conversations:
+            if conversation_id not in conversations:
 
-                self.conversations[conversation_id] = []
+                conversations[conversation_id] = []
 
-            self.conversations[conversation_id].append({
+            conversations[conversation_id].append({
 
                 "role": role,
                 "content": content
@@ -33,9 +33,9 @@ class ConversationStore:
 
             # LIMIT HISTORY
 
-            if len(self.conversations[conversation_id]) > MAX_MESSAGES:
+            if len(conversations[conversation_id]) > MAX_MESSAGES:
 
-                self.conversations[conversation_id].pop(0)
+                conversations[conversation_id].pop(0)
 
 
     def get_history(self, conversation_id):
@@ -45,7 +45,7 @@ class ConversationStore:
 
         with self.lock:
 
-            return self.conversations.get(
+            return conversations.get(
 
                 conversation_id,
                 []
@@ -57,6 +57,6 @@ class ConversationStore:
 
         with self.lock:
 
-            if conversation_id in self.conversations:
+            if conversation_id in conversations:
 
-                del self.conversations[conversation_id]
+                del conversations[conversation_id]

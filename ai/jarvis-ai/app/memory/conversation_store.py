@@ -1,11 +1,15 @@
-conversation = []
+conversations = {}
 
 MAX_HISTORY = 50
 
 
-def add_entry(user, response):
+def add_entry(conversation_id, user, response):
 
-    conversation.append({
+    if conversation_id not in conversations:
+
+        conversations[conversation_id] = []
+
+    conversations[conversation_id].append({
 
         "user": user,
 
@@ -13,16 +17,16 @@ def add_entry(user, response):
 
     })
 
-    if len(conversation) > MAX_HISTORY:
+    if len(conversations[conversation_id]) > MAX_HISTORY:
 
-        conversation.pop(0)
+        conversations[conversation_id].pop(0)
 
 
-def get_history():
+def get_history(conversation_id):
 
-    return conversation
-    
-    
-def get_conversation():
+    return conversations.get(conversation_id,[])
 
-    return get_history()
+
+def get_conversation(conversation_id):
+
+    return get_history(conversation_id)

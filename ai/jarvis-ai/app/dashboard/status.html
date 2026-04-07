@@ -180,6 +180,8 @@ document.getElementById("performance").innerHTML=
 
 let error_types = e.error_types || {};
 
+let intel = e.error_intelligence || {};
+
 let error_html = "";
 
 Object.entries(error_types).forEach(([k,v])=>{
@@ -207,6 +209,16 @@ document.getElementById("health").innerHTML=
 "LAST ERROR: "+(e.last_error ?? "none")+"<br>"+
 
 "ERROR TYPES:<br>"+(error_html || "none")+"<br>"+
+
+"ERROR INTELLIGENCE:<br>"+
+
+"CONFIG: "+(intel.config_errors ?? 0)+"<br>"+
+
+"DEPENDENCY: "+(intel.dependency_errors ?? 0)+"<br>"+
+
+"NETWORK: "+(intel.network_errors ?? 0)+"<br>"+
+
+"TIMEOUT: "+(intel.timeout_errors ?? 0)+"<br>"+
 
 "LAST EVENT: "+(e.last_event ?? "none")+"<br>"+
 

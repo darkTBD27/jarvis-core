@@ -1,4 +1,4 @@
-CONFIG = {
+WORKER_CONFIG = {
 
     "worker_idle_sleep":0.05,
 
@@ -17,6 +17,6 @@ CONFIG = {
 }
 
 
-def get_config(name,default=None):
+def get_worker_config(name,default=None):
 
-    return CONFIG.get(name,default)
+    return WORKER_CONFIG.get(name,default)

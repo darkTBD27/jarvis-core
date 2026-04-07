@@ -8,8 +8,9 @@ from inference.runtime_object import get_runtime
 from inference.runtime_health import calculate_health
 from inference.runtime_automation import run_automation
 from inference.runtime_automation import check_runtime_triggers
-from inference.runtime_config import get_config
+from inference.worker_config import get_worker_config
 from inference.runtime_state import add_runtime_event
+from inference.runtime_errors import add_error
 
 from inference.reasoning.reasoning_engine import ReasoningEngine
 
@@ -17,7 +18,7 @@ import time
 import traceback
 
 
-WORKER_IDLE_SLEEP = get_config("worker_idle_sleep")
+WORKER_IDLE_SLEEP = get_worker_config("worker_idle_sleep")
 
 
 class RuntimeWorker:
@@ -93,7 +94,7 @@ class RuntimeWorker:
 
 
                 retry_count = 0
-                max_retries = get_config("worker_max_retries")
+                max_retries = get_worker_config("worker_max_retries")
 
                 prompt = payload[0]
                 max_tokens = payload[1]
@@ -145,7 +146,7 @@ class RuntimeWorker:
 
                         duration = time.time() - start_exec
 
-                        if duration > get_config("slow_request_seconds"):
+                        if duration > get_worker_config("slow_request_seconds"):
 
                             self.runtime.set_health("degraded")
 
@@ -176,6 +177,8 @@ class RuntimeWorker:
 
                 error_type = type(e).__name__
 
+                add_error(error_type)
+
                 self.runtime.set_state("error")
 
                 self.runtime.worker_status = "error"
@@ -186,7 +189,7 @@ class RuntimeWorker:
                 traceback.print_exc()
 
                 time.sleep(
-                    get_config("worker_error_sleep")
+                    get_worker_config("worker_error_sleep")
                 )
 
 
