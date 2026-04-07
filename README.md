@@ -119,6 +119,12 @@ Worker
 
 ---
 
+# Architecture Diagram
+
+Detailed runtime architecture:
+
+[Architecture Overview](docs/architecture.md)
+
 # Kern Komponenten
 
 Runtime Core:
