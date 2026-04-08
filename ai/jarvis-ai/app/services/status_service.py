@@ -1,9 +1,12 @@
 from inference.runtime_health import get_runtime_health
 from inference.runtime_health import get_error_intelligence
+
 from inference.runtime_object import get_runtime
+
 from inference.runtime_state import get_last_error
 from inference.runtime_state import get_error_types
 
+from inference.runtime_intelligence import get_runtime_intelligence
 
 def get_status():
 
@@ -111,7 +114,9 @@ def get_status():
 
         "history": engine.get("history",[]),
 
-        "health": get_runtime_health()
+        "health": get_runtime_health(),
+
+        "error_intelligence": get_runtime_intelligence()
 
     }
 
@@ -170,7 +175,7 @@ def get_status():
 
         "error_history": rt.get_error_history(),
 
-        "error_intelligence": get_error_intelligence(),
+        "error_intelligence": get_runtime_intelligence(),
 
         "runtime_events": rt.get_runtime_events()[-10:]
 

@@ -10,25 +10,73 @@ body{
 background:#0b0f14;
 color:#00ff9c;
 font-family:monospace;
-padding:20px;
+
+margin:0;
+padding:0;
+}
+
+.container{
+width:100%;
+max-width:1400px;
+margin:auto;
+
+display:flex;
+flex-direction:column;
+gap:12px;
+}
+
+.banner{
+border:1px solid #00ff9c;
+padding:12px;
+margin-bottom:12px;
+background:#0f141b;
+
+display:grid;
+grid-template-columns: auto 1fr;
+align-items:center;
+
+width:100%;
+box-sizing:border-box;
+
+min-height:48px;
+gap:20px;
+}
+
+.grid{
+display:grid;
+
+grid-template-columns:
+repeat(auto-fit,minmax(420px,1fr));
+
+gap:12px;
+
+align-items:stretch;
+
+grid-auto-rows:1fr;
 }
 
 .box{
 border:1px solid #00ff9c;
 padding:12px;
-margin-bottom:12px;
-width:420px;
-}
+background:#0f141b;
 
-.grid{
+width:100%;
+height:100%;
+
 display:flex;
-flex-wrap:wrap;
-gap:10px;
+flex-direction:column;
+justify-content:flex-start;
 }
 
 .title{
 color:#00ffaa;
-margin-bottom:6px;
+margin-bottom:10px;
+font-weight:bold;
+letter-spacing:1px;
+}
+
+.box br{
+line-height:1.6;
 }
 
 button{
@@ -38,44 +86,90 @@ border:1px solid #00ffaa;
 cursor:pointer;
 }
 
+.good{color:#00ff9c;}
+.warn{color:#ffd166;}
+.bad{color:#ff5c5c;}
+
 </style>
 
 </head>
 
 <body>
 
+<div class="container">
+
 <h2>JARVIS CORE RUNTIME</h2>
+
+<div id="global_status" class="banner"></div>
 
 <div class="grid">
 
 <div id="runtime"></div>
+<div id="health"></div>
 <div id="active"></div>
 <div id="performance"></div>
-<div id="health"></div>
 <div id="runtime_events"></div>
 <div id="history"></div>
 
 </div>
 
+</div>
+
 <script>
 
-let dashboardLoop = null;
+let dashboardLoop=null;
+
+function stateColor(v){
+
+if(v==="critical") return "bad";
+if(v==="warning") return "warn";
+if(v==="increasing") return "warn";
+if(v==="high") return "bad";
+if(v==="medium") return "warn";
+
+return "good";
+
+}
 
 async function load(){
 
 try{
 
-let r = await fetch("/status");
+let r=await fetch("/status");
 
 if(!r.ok){
 throw new Error("Status request failed");
 }
 
-let d = await r.json();
+let d=await r.json();
 
-let e = d.inference?.engine || {};
+let e=d.inference?.engine || {};
+let last=e.last_request || {};
 
-let last = e.last_request || {};
+let intel=e.error_intelligence || {};
+let instability=intel.instability || "stable";
+
+
+// GLOBAL STATUS
+
+document.getElementById("global_status").innerHTML=
+
+"<div class='title'>RUNTIME STATUS</div>"+
+
+"<div>"+
+
+"STATE: <span class='"+stateColor(instability)+"'>"+
+instability.toUpperCase()+
+"</span>"+
+
+" | REQUESTS: "+(e.total_requests ?? 0)+
+
+" | ERRORS: "+(e.errors ?? 0)+
+
+" | HEALTH: "+
+(e.health ?? "unknown").toUpperCase()+
+
+"</div>";
 
 
 // RUNTIME
@@ -107,18 +201,58 @@ document.getElementById("runtime").innerHTML=
 "</div>";
 
 
+// HEALTH
+
+let error_html="";
+
+Object.entries(e.error_types || {}).forEach(([k,v])=>{
+error_html+=k+": "+v+"<br>";
+});
+
+document.getElementById("health").innerHTML=
+
+"<div class='box'>"+
+
+"<div class='title'>HEALTH</div>"+
+
+"ERRORS: "+(e.errors ?? 0)+"<br>"+
+
+"TIMEOUTS: "+(e.timeouts ?? 0)+"<br>"+
+
+"SUCCESS: "+(e.success_requests ?? 0)+"<br>"+
+
+"SLOW: "+(e.slow_requests ?? 0)+"<br>"+
+
+"LAST SUCCESS: "+(e.last_success_request ?? "none")+"<br>"+
+
+"LAST ERROR: "+(e.last_error ?? "none")+"<br>"+
+
+"ERROR TYPES:<br>"+(error_html || "none")+"<br>"+
+
+"<br>ERROR INTELLIGENCE:<br>"+
+
+"STABILITY SCORE: "+(intel.stability_score ?? 100)+"<br>"+
+
+"RISK LEVEL: "+(intel.risk_level ?? "low")+"<br>"+
+
+"TREND: "+(intel.error_trend ?? "stable")+"<br>"+
+
+"INSTABILITY: "+(intel.instability ?? "stable")+"<br>"+
+
+"RECENT ERRORS: "+(intel.error_patterns?.last_minute ?? 0)+"<br>"+
+
+"</div>";
+
+
 // ACTIVE
 
 let queue_html="";
 
-let queued = e.queued_requests || [];
+(e.queued_requests || []).forEach(q=>{
 
-queued.forEach(q=>{
-
-queue_html +=
+queue_html+=
 q+
-" <button onclick=\"cancelRequest('"+q+"')\">cancel</button>"+
-"<br>";
+" <button onclick=\"cancelRequest('"+q+"')\">cancel</button><br>";
 
 });
 
@@ -138,9 +272,7 @@ document.getElementById("active").innerHTML=
 "<div class='title'>ACTIVE</div>"+
 
 "CURRENT: "+(e.current_request || "none")+
-cancel_btn+
-
-"<br>"+
+cancel_btn+"<br>"+
 
 "LAST: "+(last?.request_id || "none")+"<br>"+
 
@@ -176,65 +308,12 @@ document.getElementById("performance").innerHTML=
 "</div>";
 
 
-// HEALTH
+// EVENTS
 
-let error_types = e.error_types || {};
+let event_html="";
 
-let intel = e.error_intelligence || {};
-
-let error_html = "";
-
-Object.entries(error_types).forEach(([k,v])=>{
-
-error_html += k+": "+v+"<br>";
-
-});
-
-document.getElementById("health").innerHTML=
-
-"<div class='box'>"+
-
-"<div class='title'>HEALTH</div>"+
-
-"ERRORS: "+(e.errors ?? 0)+"<br>"+
-
-"TIMEOUTS: "+(e.timeouts ?? 0)+"<br>"+
-
-"SUCCESS: "+(e.success_requests ?? 0)+"<br>"+
-
-"SLOW: "+(e.slow_requests ?? 0)+"<br>"+
-
-"LAST SUCCESS: "+(e.last_success_request ?? "none")+"<br>"+
-
-"LAST ERROR: "+(e.last_error ?? "none")+"<br>"+
-
-"ERROR TYPES:<br>"+(error_html || "none")+"<br>"+
-
-"ERROR INTELLIGENCE:<br>"+
-
-"CONFIG: "+(intel.config_errors ?? 0)+"<br>"+
-
-"DEPENDENCY: "+(intel.dependency_errors ?? 0)+"<br>"+
-
-"NETWORK: "+(intel.network_errors ?? 0)+"<br>"+
-
-"TIMEOUT: "+(intel.timeout_errors ?? 0)+"<br>"+
-
-"LAST EVENT: "+(e.last_event ?? "none")+"<br>"+
-
-"</div>";
-
-
-// RUNTIME EVENTS
-
-let events = e.runtime_events || [];
-
-let event_html = "";
-
-events.slice().reverse().forEach(ev=>{
-
-event_html += ev.type+"<br>";
-
+(e.runtime_events || []).slice().reverse().forEach(ev=>{
+event_html+=ev.type+"<br>";
 });
 
 document.getElementById("runtime_events").innerHTML=
@@ -250,15 +329,13 @@ document.getElementById("runtime_events").innerHTML=
 
 // HISTORY
 
-let history = e.history || [];
-
 let history_html=
 
 "<div class='box'>"+
 
 "<div class='title'>REQUEST HISTORY</div>";
 
-history.slice(-15).reverse().forEach(r=>{
+(e.history || []).slice(-15).reverse().forEach(r=>{
 
 let err="";
 
@@ -273,8 +350,7 @@ history_html+=
 " | "+r.duration+"s"+
 " | "+r.tokens+" tok"+
 " | "+r.tokens_per_sec+" t/s"+
-err+
-"<br>";
+err+"<br>";
 
 });
 
@@ -310,7 +386,6 @@ clearInterval(dashboardLoop);
 dashboardLoop=setInterval(load,1000);
 
 }
-
 
 load().then(startLoop);
 

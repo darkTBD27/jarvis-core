@@ -323,137 +323,414 @@ If a change adds magic:
 
 It is wrong.
 
+---
+
+# ENGINEERING WORKFLOW CONTRACT
+
+Jarvis development follows strict engineering workflow rules.
+
+Development is phase driven.
+
+Not continuous.
+
+Rule:
+
+Build → Harden → Verify → Complete
+
+
+========================================
+PHASE ENGINEERING MODEL
+========================================
+
+Jarvis development occurs in defined phases.
+
+Each phase has:
+
+Name
+
+Goal
+
+Scope
+
+End Condition
+
+Result
+
+
+========================================
+PHASE EXECUTION MODEL
+========================================
+
+Each phase consists of:
+
+BUILD
+
+HARDENING
+
+VERIFICATION
+
+COMPLETION
+
+
+========================================
+BUILD CONTRACT
+========================================
+
+Build phase may:
+
+Add features
+
+Add modules
+
+Add architecture
+
+Build quickly.
+
+
+========================================
+HARDENING CONTRACT
+========================================
+
+Hardening must verify:
+
+Imports
+
+Runtime startup
+
+Metrics
+
+State integrity
+
+Error tracking
+
+Thread safety
+
+Regression safety
+
+
+Rule:
+
+Feature without hardening is unfinished.
+
+
+========================================
+VERIFICATION CONTRACT
+========================================
+
+Verification must confirm:
+
+System starts
+
+No runtime errors
+
+Dashboard stable
+
+Metrics correct
+
+No regression
+
+
+Rule:
+
+Working is not enough.
+
+Stable working is required.
+
+
+========================================
+PHASE COMPLETION CONTRACT
+========================================
+
+A phase is complete only when:
+
+Build complete
+
+Hardening complete
+
+Verification complete
+
+Runtime stable
+
+
+========================================
+PHASE LOCK CONTRACT
+========================================
+
+After phase completion:
+
+No more modifications.
+
+No quick fixes.
+
+No "one more change".
+
+New phase required.
+
+
+========================================
+MANDATORY PHASE CUT RULE
+========================================
+
+After phase completion:
+
+New engineering session required.
+
+Reason:
+
+Prevent context drift.
+
+Protect architecture focus.
+
+
+========================================
+CURRENT TASK RULE
+========================================
+
+Each phase must have:
+
+Current Task.
+
+Only current task is worked on.
+
+No jumping.
+
+No mixing problems.
+
+When task complete:
+
+Hardening begins.
+
+
+========================================
+CONTEXT SAFETY CONTRACT
+========================================
+
+Large conversations create:
+
+Context drift
+
+Repeated fixes
+
+Architecture inconsistency
+
+Mental overload
+
+
+Rule:
+
+Development must be phase isolated.
+
+
+========================================
+CONVERSATION DISCIPLINE CONTRACT
+========================================
+
+Engineering conversations must not grow unlimited.
+
+One phase = one conversation.
+
+After phase completion:
+
+New conversation.
+
+
+========================================
+VERIFICATION RULE
+========================================
+
+Arya must never assume:
+
+Code exists
+
+Fix exists
+
+Structure unchanged
+
+If unsure:
+
+Code must be verified.
+
+
+Rule:
+
+ASSUME NOTHING
+
+VERIFY EVERYTHING
+
+
+========================================
+ENGINEERING TRUTH RULE
+========================================
+
+Code is truth.
+
+Not memory.
+
+Not context.
+
+Not assumptions.
+
+
+========================================
+ENGINEERING DISCIPLINE LAW
+========================================
+
+Never build forever.
+
+Always build in phases.
+
+
+========================================
+FINAL ENGINEERING RULE
+========================================
+
+If a change improves stability:
+
+Correct.
+
+If a change improves observability:
+
+Correct.
+
+If a change improves structure:
+
+Correct.
+
+If a change creates chaos:
+
+Wrong.
+
 
 # DEUTSCHE VERSION
 
 # JARVIS CORE BACKBONE
-Runtime Architecture Contract
+Runtime Architektur Vertrag
 
-This document defines the non-negotiable architecture rules of Jarvis Core.
+Dieses Dokument definiert die nicht verhandelbaren Architekturregeln von Jarvis Core.
 
-Violation of these rules is considered architecture breakage.
+Verstöße gegen diese Regeln gelten als Architekturbruch.
 
 ---
 
-# RUNTIME TRUTH MODEL
+# RUNTIME WAHRHEITSMODELL
 
-Jarvis follows a strict Runtime Truth Model.
+Jarvis folgt einem strikten Runtime Truth Model.
 
-Only RuntimeState owns runtime truth.
+Nur RuntimeState besitzt die Runtime Wahrheit.
 
-Forbidden:
+Verboten:
 
-Services owning state
-Workers owning global state
-API owning runtime state
+Services besitzen State
+Worker besitzen globalen State
+API besitzt Runtime State
 
-Allowed:
+Erlaubt:
 
-RuntimeState owns runtime state
-Services read runtime
-Worker updates runtime
+RuntimeState besitzt Runtime State
+Services lesen Runtime
+Worker aktualisieren Runtime
 
-Rule:
+Regel:
 
 RuntimeState = Single Source of Truth
 
 ---
 
-# EXECUTION MODEL
+# EXECUTION MODELL
 
-Jarvis execution must always follow:
+Jarvis Execution muss immer diesem Flow folgen:
 
 Queue → Worker → Runtime → Metrics → History
 
-Never:
+Niemals:
 
-API → Inference directly
+API → Inference direkt
 
-Reason:
+Grund:
 
-Execution determinism.
-
----
-
-# WORKER CONTRACT
-
-Worker responsibilities:
-
-Queue processing
-Heartbeat update
-Health calculation
-Reasoning execution
-Automation execution
-Metrics update
-Runtime update
-
-Worker must never:
-
-Hold long state
-Store global decisions
-Modify architecture
-
-Worker is execution only.
+Deterministische Execution.
 
 ---
 
-# HEALTH CONTRACT
+# WORKER VERTRAG
 
-Health must always be calculated from:
+Worker Verantwortlichkeiten:
+
+Queue Verarbeitung
+Heartbeat Update
+Health Berechnung
+Reasoning Execution
+Automation Execution
+Metrics Update
+Runtime Update
+
+Worker darf niemals:
+
+Langfristigen State halten
+Globale Entscheidungen speichern
+Architektur verändern
+
+Worker ist reine Execution.
+
+---
+
+# HEALTH VERTRAG
+
+Health muss immer berechnet werden aus:
 
 Metrics
 Errors
 Timeouts
-Queue pressure
-Worker state
+Queue Pressure
+Worker Status
 
-Health must never:
+Health darf niemals:
 
-Be manually set outside Runtime.
+Manuell außerhalb der Runtime gesetzt werden.
 
-Health is computed truth.
+Health ist berechnete Wahrheit.
 
 ---
 
-# METRIC CONTRACT
+# METRIC VERTRAG
 
-Every execution must update:
+Jede Execution muss aktualisieren:
 
 requests_total
 duration
 tokens
-success or error
+success oder error
 
-Never:
+Niemals:
 
-Silent execution.
+Silent Execution.
 
-All execution must be observable.
-
----
-
-# ERROR CONTRACT
-
-Every error must:
-
-Have type
-Have timestamp
-Be recorded
-Update metrics
-
-Future:
-
-Error pattern detection
-Error clustering
-Error intelligence
-
-Errors are data.
+Alle Execution muss beobachtbar sein.
 
 ---
 
-# EVENT CONTRACT
+# ERROR VERTRAG
 
-Every important runtime action must create event:
+Jeder Error muss:
+
+Einen Typ besitzen
+Einen Timestamp besitzen
+Gespeichert werden
+Metrics aktualisieren
+
+Zukunft:
+
+Error Pattern Detection
+Error Clustering
+Error Intelligence
+
+Errors sind Daten.
+
+---
+
+# EVENT VERTRAG
+
+Jede wichtige Runtime Aktion muss ein Event erzeugen:
 
 Request start
 Request finish
@@ -461,142 +738,142 @@ Request error
 Health change
 Worker stall
 
-Events are runtime memory.
+Events sind Runtime Memory.
 
-Purpose:
+Zweck:
 
-Debug
+Debugging
 Intelligence
-Trust
+Vertrauen
 
 ---
 
-# STATE TRANSITION CONTRACT
+# STATE TRANSITION VERTRAG
 
-Allowed transitions:
+Erlaubte Übergänge:
 
 idle → processing
 processing → idle
 processing → error
 error → idle
 
-Forbidden:
+Verboten:
 
-idle → error without reason
+idle → error ohne Grund
 processing → processing
-error → processing without reset
+error → processing ohne Reset
 
-State must always be explainable.
-
----
-
-# OBSERVABILITY CONTRACT
-
-Jarvis must always know:
-
-What it is doing
-Why it is doing it
-How long it takes
-If it is healthy
-
-If not observable → architecture failure.
+State muss immer erklärbar sein.
 
 ---
 
-# AUTOMATION CONTRACT
+# OBSERVABILITY VERTRAG
 
-Automation may:
+Jarvis muss jederzeit wissen:
 
-React to health
-React to errors
-React to runtime state
+Was es macht
+Warum es das macht
+Wie lange es dauert
+Ob es gesund ist
 
-Automation may never:
-
-Change architecture
-Change core rules
-Modify runtime truth
-
-Automation assists.
-It does not control.
+Wenn nicht beobachtbar → Architekturfehler.
 
 ---
 
-# INTELLIGENCE CONTRACT
+# AUTOMATION VERTRAG
 
-Jarvis intelligence must be:
+Automation darf:
 
-Deterministic
-Observable
-Controlled
-Limited
+Auf Health reagieren
+Auf Errors reagieren
+Auf Runtime State reagieren
 
-Jarvis must never:
+Automation darf niemals:
 
-Self modify code
-Change architecture
-Rewrite rules
-Self deploy
+Architektur verändern
+Core Regeln verändern
+Runtime Wahrheit verändern
 
-Jarvis is runtime intelligence.
-
-Not autonomous AI.
+Automation unterstützt.
+Sie kontrolliert nicht.
 
 ---
 
-# SAFETY CONTRACT
+# INTELLIGENCE VERTRAG
 
-Jarvis must never:
+Jarvis Intelligence muss sein:
 
-Self update
-Self repair code
-Execute unknown commands
-Modify system without explicit tool
+Deterministisch
+Beobachtbar
+Kontrolliert
+Begrenzt
 
-Reason:
+Jarvis darf niemals:
 
-Predictability.
+Code selbst verändern
+Architektur verändern
+Regeln umschreiben
+Sich selbst deployen
 
----
+Jarvis ist Runtime Intelligence.
 
-# EVOLUTION CONTRACT
-
-New features must:
-
-Respect runtime model
-Respect state ownership
-Respect health model
-Respect worker model
-
-If not:
-
-Feature rejected.
-
-Architecture first.
+Keine autonome AI.
 
 ---
 
-# DESIGN PHILOSOPHY
+# SAFETY VERTRAG
 
-Jarvis is built like:
+Jarvis darf niemals:
 
-A database engine
-A scheduler
-A runtime kernel
+Sich selbst updaten
+Code selbst reparieren
+Unbekannte Commands ausführen
+System ohne Tool verändern
 
-Not like:
+Grund:
 
-A chatbot
-An AI toy
-An experiment
-
-Jarvis is infrastructure.
+Vorhersagbarkeit.
 
 ---
 
-# CURRENT BACKBONE STATUS
+# EVOLUTION VERTRAG
 
-Stable:
+Neue Features müssen:
+
+Runtime Model respektieren
+State Ownership respektieren
+Health Model respektieren
+Worker Model respektieren
+
+Wenn nicht:
+
+Feature ablehnen.
+
+Architektur zuerst.
+
+---
+
+# DESIGN PHILOSOPHIE
+
+Jarvis wird gebaut wie:
+
+Eine Datenbank Engine
+Ein Scheduler
+Ein Runtime Kernel
+
+Nicht wie:
+
+Ein Chatbot
+Ein AI Spielzeug
+Ein Experiment
+
+Jarvis ist Infrastruktur.
+
+---
+
+# AKTUELLER BACKBONE STATUS
+
+Stabil:
 
 Runtime Worker
 Runtime State
@@ -606,7 +883,7 @@ Error Tracking
 Event Logging
 Dashboard
 
-Foundation ready for:
+Fundament bereit für:
 
 Error Intelligence
 Pattern Detection
@@ -614,32 +891,311 @@ Adaptive Health
 
 ---
 
-# ARCHITECTURAL IDENTITY
+# ARCHITEKTUR IDENTITÄT
 
-Jarvis is:
+Jarvis ist:
 
-A deterministic AI runtime.
+Eine deterministische AI Runtime.
 
-Not:
+Nicht:
 
-An autonomous agent.
+Ein autonomer Agent.
 
 ---
 
-# FINAL RULE
+# FINALE REGEL
 
-If a change breaks determinism:
+Wenn eine Änderung Determinismus bricht:
 
-It is wrong.
+Ist sie falsch.
 
-If a change improves observability:
+Wenn eine Änderung Observability verbessert:
 
-It is correct.
+Ist sie richtig.
 
-If a change improves stability:
+Wenn eine Änderung Stabilität verbessert:
 
-It is correct.
+Ist sie richtig.
 
-If a change adds magic:
+Wenn eine Änderung Magie hinzufügt:
 
-It is wrong.
+Ist sie falsch.
+
+---
+
+# ENGINEERING WORKFLOW VERTRAG
+
+Die Jarvis Entwicklung folgt festen Engineering Arbeitsregeln.
+
+Entwicklung erfolgt in Phasen.
+
+Nicht kontinuierlich.
+
+Regel:
+
+Build → Hardening → Verifikation → Abschluss
+
+
+========================================
+PHASEN ENGINEERING MODELL
+========================================
+
+Jarvis Entwicklung erfolgt in klar definierten Phasen.
+
+Jede Phase besitzt:
+
+Name
+
+Ziel
+
+Scope
+
+Endbedingung
+
+Resultat
+
+
+========================================
+PHASEN AUSFÜHRUNGSMODELL
+========================================
+
+Jede Phase besteht aus:
+
+BUILD
+
+HARDENING
+
+VERIFIKATION
+
+ABSCHLUSS
+
+
+========================================
+BUILD REGEL
+========================================
+
+Die Build Phase darf:
+
+Features hinzufügen
+
+Module hinzufügen
+
+Architektur erweitern
+
+Ziel:
+
+Schnelle Implementierung.
+
+
+========================================
+HARDENING REGEL
+========================================
+
+Hardening muss prüfen:
+
+Imports
+
+Runtime Start
+
+Metrics
+
+State Integrität
+
+Error Tracking
+
+Thread Sicherheit
+
+Regression Schutz
+
+
+Regel:
+
+Feature ohne Hardening ist nicht fertig.
+
+
+========================================
+VERIFIKATIONS REGEL
+========================================
+
+Verifikation muss bestätigen:
+
+System startet
+
+Keine Runtime Errors
+
+Dashboard stabil
+
+Metrics korrekt
+
+Keine Regression
+
+
+Regel:
+
+Funktionierend reicht nicht.
+
+Stabil funktionierend ist erforderlich.
+
+
+========================================
+PHASEN ABSCHLUSS REGEL
+========================================
+
+Eine Phase ist erst abgeschlossen wenn:
+
+Build fertig
+
+Hardening fertig
+
+Verifikation fertig
+
+Runtime stabil
+
+
+========================================
+PHASEN LOCK REGEL
+========================================
+
+Nach Phase Completion:
+
+Keine Änderungen mehr.
+
+Keine Quick Fixes.
+
+Kein "nur noch schnell".
+
+Neue Phase beginnen.
+
+
+========================================
+VERPFLICHTENDER PHASEN SCHNITT
+========================================
+
+Nach Phase Abschluss:
+
+Neuer Engineering Chat.
+
+Grund:
+
+Kontext Drift verhindern.
+
+Architektur Fokus schützen.
+
+
+========================================
+CURRENT TASK REGEL
+========================================
+
+Jede Phase besitzt:
+
+Einen Current Task.
+
+Nur dieser Task wird bearbeitet.
+
+Keine Sprünge.
+
+Keine Vermischung.
+
+Wenn Task fertig:
+
+Hardening beginnt.
+
+
+========================================
+KONTEXT SICHERHEITS REGEL
+========================================
+
+Große Chats erzeugen:
+
+Kontext Drift
+
+Fix Wiederholungen
+
+Architektur Inkonsistenz
+
+Mentale Überlastung
+
+
+Regel:
+
+Entwicklung muss phasenweise isoliert erfolgen.
+
+
+========================================
+CONVERSATION DISZIPLIN REGEL
+========================================
+
+Engineering Chats dürfen nicht unbegrenzt wachsen.
+
+Eine Phase = eine Conversation.
+
+Nach Phase Abschluss:
+
+Neue Conversation.
+
+
+========================================
+VERIFIKATIONS REGEL
+========================================
+
+Arya darf niemals annehmen:
+
+Dass Code existiert
+
+Dass Fix existiert
+
+Dass Struktur unverändert ist
+
+Wenn Unsicherheit:
+
+Code prüfen lassen.
+
+
+Regel:
+
+NICHT ANNEHMEN
+
+IMMER PRÜFEN
+
+
+========================================
+ENGINEERING WAHRHEITS REGEL
+========================================
+
+Code ist Wahrheit.
+
+Nicht Erinnerung.
+
+Nicht Kontext.
+
+Nicht Annahmen.
+
+
+========================================
+ENGINEERING DISZIPLIN GESETZ
+========================================
+
+Niemals endlos bauen.
+
+Immer in Phasen bauen.
+
+
+========================================
+FINALE ENGINEERING REGEL
+========================================
+
+Wenn eine Änderung Stabilität verbessert:
+
+Richtig.
+
+Wenn eine Änderung Observability verbessert:
+
+Richtig.
+
+Wenn eine Änderung Struktur verbessert:
+
+Richtig.
+
+Wenn eine Änderung Chaos erzeugt:
+
+Falsch.

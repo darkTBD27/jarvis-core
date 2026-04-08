@@ -18,11 +18,16 @@ Architecture: Stabilized
 
 Current Phase:
 
-Phase 4 – Error Intelligence Layer ✔
+Phase 4 – Runtime Intelligence Foundation ✔
 
 Next Phase:
 
-Phase 5 – Runtime Intelligence Layer
+Phase 5 – Runtime Intelligence Expansion
+
+Project Direction:
+
+Jarvis entwickelt sich zu einer Runtime Intelligence Engine
+mit Fokus auf Stabilität, Observability und deterministische Execution.
 
 Project Direction:
 
@@ -60,6 +65,8 @@ Error Tracking vorhanden
 Error Intelligence vorhanden
 Runtime Hardening abgeschlossen
 Dashboard vorhanden
+Runtime Intelligence Foundation vorhanden
+Engineering Phase System definiert
 
 Nächster Schritt:
 
@@ -182,6 +189,28 @@ Jarvis soll erklärbar bleiben.
 
 ---
 
+# Engineering Workflow
+
+Jarvis wird in klaren Engineering Phasen entwickelt:
+
+Build Phase
+Hardening Phase
+Verification Phase
+Phase Completion
+
+Nach jeder abgeschlossenen Phase beginnt eine neue Engineering Session.
+
+Ziel:
+
+Kontext Drift verhindern
+Architektur Stabilität sichern
+Engineering Fokus erhalten
+
+Jarvis wird als Engineering System entwickelt.
+Nicht als Feature Sammlung.
+
+---
+
 # Runtime Health System
 
 Health basiert auf:
@@ -296,11 +325,11 @@ http://localhost:8002/dashboard/status.html
 
 # Entwicklungsstatus
 
-Phase 1 – Execution Core ✔
+Phase 1 – Runtime Core ✔
 Phase 2 – Observability ✔
-Phase 3 – Runtime Intelligence Foundation ✔
-Phase 4 – Error Intelligence ✔
-Phase 5 – Runtime Intelligence (next)
+Phase 3 – Error Intelligence ✔
+Phase 4 – Runtime Intelligence Foundation ✔
+Phase 5 – Runtime Intelligence Expansion (next)
 
 ---
 
