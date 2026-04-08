@@ -255,7 +255,6 @@ Docker Setup
 
 # Projektstruktur
 
-```
 jarvis-core/
 
 ai/jarvis-ai/app/
@@ -268,7 +267,6 @@ config/
 error/
 
 scripts/
-```
 
 ---
 
@@ -282,23 +280,17 @@ Linux empfohlen
 
 Start:
 
-```
 docker compose up -d
-```
 
 Status prüfen:
 
-```
 curl localhost:8002/status
-```
 
 Dashboard:
 
 Browser öffnen:
 
-```
 http://localhost:8002/dashboard/status.html
-```
 
 ---
 
