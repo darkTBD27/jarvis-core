@@ -54,6 +54,29 @@ Execution determinism.
 
 ---
 
+# INTELLIGENCE EXECUTION LAYER
+
+Jarvis includes a controlled intelligence layer between execution and action.
+
+Flow:
+
+Worker → Runtime Intelligence → Signal Generation → Signal Stability → Decision Engine → Action Mapping → Action Execution
+
+Rules:
+
+- No action without confirmed signal
+- No action without stability validation
+- No action without quality threshold (confidence / priority)
+- No action without cooldown
+
+Purpose:
+
+Prevent unstable behavior  
+Ensure deterministic decision making  
+Maintain runtime safety
+
+---
+
 # WORKER CONTRACT
 
 Worker responsibilities:
@@ -636,7 +659,7 @@ RuntimeState = Single Source of Truth
 
 ---
 
-# EXECUTION MODELL
+# EXECUTION MODEL
 
 Jarvis Execution muss immer diesem Flow folgen:
 
@@ -651,6 +674,28 @@ Grund:
 Deterministische Execution.
 
 ---
+
+# INTELLIGENCE EXECUTION LAYER
+
+Jarvis besitzt eine kontrollierte Intelligence-Schicht zwischen Execution und Action.
+
+Flow:
+
+Worker → Runtime Intelligence → Signal Generierung → Signal Stabilität → Decision Engine → Action Mapping → Action Execution
+
+Regeln:
+
+* Keine Action ohne bestätigtes Signal
+* Keine Action ohne Stabilitätsprüfung
+* Keine Action ohne Qualitätsprüfung (Confidence / Priority)
+* Keine Action ohne Cooldown
+
+Zweck:
+
+Verhindert instabiles Verhalten
+Sichert deterministische Entscheidungsfindung
+Erhält Runtime Stabilität
+
 
 # WORKER VERTRAG
 

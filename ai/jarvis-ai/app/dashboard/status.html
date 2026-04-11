@@ -241,6 +241,14 @@ document.getElementById("health").innerHTML=
 
 "RECENT ERRORS: "+(intel.error_patterns?.last_minute ?? 0)+"<br>"+
 
+"SIGNALS: "+(
+    (intel.signals || []).map(s => {
+        if (typeof s === "string") return s;
+        if (s && s.type) return s.type;
+        return "unknown";
+    }).join(", ") || "none"
+)+"<br>"+
+
 "</div>";
 
 
@@ -316,6 +324,30 @@ let event_html="";
 event_html+=ev.type+"<br>";
 });
 
+let signal_html="";
+
+(e.signal_history || []).slice(-10).reverse().forEach(s=>{
+
+let line = (s.signals || []).map(sig => {
+
+if (typeof sig === "string") {
+    return sig + " (stable)";
+}
+
+if (sig && sig.type) {
+    return sig.type + (sig.stable ? " (stable)" : "");
+}
+
+return "unknown";
+
+}).join(" | ");
+
+let time = new Date(s.time * 1000).toLocaleTimeString();
+
+signal_html += line + " (" + time + ")" + "<br>";
+
+});
+
 document.getElementById("runtime_events").innerHTML=
 
 "<div class='box'>"+
@@ -323,6 +355,10 @@ document.getElementById("runtime_events").innerHTML=
 "<div class='title'>RUNTIME EVENTS</div>"+
 
 (event_html || "none")+
+
+"<br><div class='title'>SIGNALS</div>"+
+
+(signal_html || "none")+
 
 "</div>";
 

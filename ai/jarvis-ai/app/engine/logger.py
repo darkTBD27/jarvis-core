@@ -1,5 +1,9 @@
 import time
 
+import logging
+
+logger = logging.getLogger("jarvis")
+
 
 def _get_request_id(request=None, request_id=None):
 
@@ -16,7 +20,7 @@ def log_inference_start(prompt, request=None, request_id=None):
     if request:
         request.mark_processing()
 
-    print(f"[AI] START request | id={rid} | prompt_length={len(prompt)}")
+    logger.info(f"[AI] START request | id={rid} | prompt_length={len(prompt)}")
 
     return time.time()
 
@@ -30,7 +34,7 @@ def log_inference_end(start_time, request=None, request_id=None):
     if request:
         request.mark_finished()
 
-    print(f"[AI] END request | id={rid} | duration={duration}s")
+    logger.info(f"[AI] END request | id={rid} | duration={duration}s")
 
 
 def log_inference_error(error, request=None, request_id=None):
@@ -40,4 +44,4 @@ def log_inference_error(error, request=None, request_id=None):
     if request:
         request.mark_error()
 
-    print(f"[AI] ERROR | id={rid} | {error}")
+    logger.info(f"[AI] ERROR | id={rid} | {error}")

@@ -7,7 +7,7 @@ class RuntimeState:
 
         self.inference_start = None
 
-        self.state = "idle"
+        self.state = "idle" 
 
         self.busy = False
 
@@ -39,7 +39,7 @@ class RuntimeState:
 
         }
 
-        self.health_state = "healthy"
+        self.health = "unknown"
 
         self.queue_size = 0
 
@@ -52,6 +52,10 @@ class RuntimeState:
         self.worker_status = "starting"
 
         self.MAX_HISTORY = 100
+
+        self.signal_history = []
+
+        self.MAX_SIGNAL_HISTORY = 100
 
         self.last_request = None
 
@@ -81,7 +85,7 @@ class RuntimeState:
 
     def get_health(self):
 
-        return self.health_state
+        return self.health
 
 
     def is_busy(self):
@@ -216,6 +220,24 @@ class RuntimeState:
     def get_health_history(self):
 
         return self.health_history
+
+
+    def add_signal_history(self, signals):
+
+        import time
+
+        entry = {
+
+            "signals": signals,
+            "time": time.time()
+
+        }
+
+        if len(self.signal_history) >= self.MAX_SIGNAL_HISTORY:
+
+            self.signal_history.pop(0)
+
+        self.signal_history.append(entry)
 
 
 RUNTIME = RuntimeState()

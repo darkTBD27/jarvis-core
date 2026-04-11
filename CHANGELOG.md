@@ -2,140 +2,156 @@
 
 All notable changes to Jarvis Core are documented here.
 
-Jarvis is developed as a runtime system, therefore changes are grouped by
-architecture evolution instead of only features.
+---
 
-------------------------------------------------------------
+# Phase 4.1 – Stable Runtime Decision Engine (Current)
 
-# Phase 4 – Error Intelligence Layer (Runtime Hardening)
-Date: 2026.April.07
+Date: 2026.April.11
 
 ## Runtime Evolution
-Jarvis moved from basic error tracking to structured runtime error intelligence.
+
+Jarvis evolved from passive runtime monitoring into an active,
+decision-driven runtime system with autonomous scaling behavior.
+
+---
 
 ## Added
 
-### Error Intelligence
-- Error classification system (category / severity / retry policy)
-- Error spike detection logic
-- Error pattern recognition
-- Error retry tracking
-- Runtime error severity mapping
+### Decision Engine
 
-### Runtime Stability
-- Thread safe error tracking
-- Error history memory protection
-- Worker configuration separation
-- Improved runtime health signals
+* Signal → Decision → Action pipeline
+* Decision object with confidence & priority
+* Decision filtering (quality gate)
 
-### Observability
-- Error intelligence visible in dashboard
-- Runtime health now reflects error categories
-- Improved runtime event tracking
+### Signal Stability Layer
+
+* Signal confirmation mechanism (multi-hit validation)
+* Stable signal detection before action
+
+### Signal Decay
+
+* Automatic reset of outdated signals
+* Time-based signal invalidation
+
+### Action System
+
+* Action mapping (signal → runtime action)
+* Worker scaling (up/down)
+* Restart logic for stalled workers
+
+### Cooldown System
+
+* Action cooldown per type
+* Prevents rapid repeated execution
+
+### Error Protection
+
+* Worker error backoff (adaptive sleep)
+* Crash loop prevention
+
+---
 
 ## Changed
 
-### Architecture
-- Single Source of Truth for error tracking (runtime_errors)
-- Metrics separated from error ownership
-- Conversation storage unified into one data source
-- Worker config separated from system config
-- Runtime config ownership clarified
+### Runtime Behavior
 
-### Runtime Design
-- Error flow:
-Runtime Worker → Error Engine → Health → Status → Dashboard
+* System now reacts only to confirmed signals
+* Reduced noise and false positives
+* More predictable scaling behavior
 
-- Clear separation between:
-Runtime State
-Error Intelligence
-Health Decisions
-Metrics
-Observability
+### Worker System
+
+* Multi-thread capable scaling
+* Controlled worker lifecycle
+* Safe downscaling with thread control flags
+
+### Logging
+
+* Centralized logging system (jarvis logger)
+* Structured runtime debug output
+
+---
 
 ## Fixed
 
 ### Stability Fixes
-- Duplicate error counters removed
-- Conversation ownership conflict resolved
-- Package import instability fixed
-- Runtime config naming conflict removed
-- Potential memory growth in error history prevented
 
-### Structural Fixes
-- Removed duplicate conversation storage models
-- Fixed runtime package initialization
-- Fixed config naming drift
-- Removed hidden error state duplication
+* Decision pipeline crash due to missing variables
+* Action mapper execution blocking
+* Logging inconsistencies across modules
+* Runtime worker thread safety improvements
 
-## Hardening
+### Architecture Fixes
 
-### Codebase Stability Pass
-- Runtime structural audit completed
-- Ownership rules enforced
-- State separation verified
-- Metrics alignment completed
+* Removed duplicate logic paths
+* Cleaned action mapping structure
+* Fixed decision object field mismatch
 
-### Runtime Safety Improvements
-- Thread safety preparation for multi worker future
-- Memory bounded error tracking
-- Config clarity improvements
+---
 
-## Internal Improvements
+## Result
 
-### Code Quality
-- Improved module separation
-- Reduced hidden coupling
-- Cleaner runtime boundaries
-- Improved maintainability
+Jarvis is now:
 
-### Engineering
-- Hardening pass before Phase 5
-- Architecture cleanup before runtime intelligence expansion
+* Stable under load ✔
+* Self-regulating ✔
+* Predictable ✔
+* Observable ✔
+* Extendable ✔
 
-------------------------------------------------------------
+---
+
+# Phase 4 – Error Intelligence Layer
+
+(previous)
+
+* Error classification system
+* Error pattern detection
+* Runtime health intelligence
+
+---
 
 # Phase 3 – Runtime Observability Layer
-(previous work)
 
-- Runtime status dashboard
-- Worker state visibility
-- Performance tracking
-- Request history tracking
+(previous)
 
-------------------------------------------------------------
+* Runtime dashboard
+* Worker monitoring
+* Performance tracking
+
+---
 
 # Phase 2 – Runtime Core
-(previous work)
 
-- Worker execution loop
-- Runtime state management
-- Tool execution flow
-- Request lifecycle tracking
+(previous)
 
-------------------------------------------------------------
+* Worker loop
+* Runtime state management
+* Request lifecycle
 
-# Phase 1 – Jarvis Foundation
-(previous work)
+---
 
-- Core runtime skeleton
-- Basic inference integration
-- Initial service structure
-- Basic health monitoring
+# Phase 1 – Foundation
 
-------------------------------------------------------------
+(previous)
 
-# Future Direction (Planned Evolution)
+* Initial runtime system
+* Basic inference integration
 
-Phase 5 – Runtime Intelligence Layer
-- Error trend detection
-- Runtime stability scoring
-- Smart retry decisions
-- Failure prediction
-- Dependency instability detection
+---
 
-Phase 6 – Adaptive Runtime
-- Self stabilization behavior
-- Runtime decision learning
-- Tool reliability scoring
-- Autonomous runtime adjustments
+# Future Direction
+
+## Phase 5 – Runtime Intelligence Layer
+
+* Decision learning
+* Adaptive scaling behavior
+* Signal weighting
+* Predictive runtime adjustments
+
+## Phase 6 – Adaptive Runtime
+
+* Self-stabilizing runtime
+* Learning-based decision system
+* Autonomous optimization
+

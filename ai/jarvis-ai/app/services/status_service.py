@@ -12,6 +12,8 @@ def get_status():
 
     rt = get_runtime()
 
+    intel = get_runtime_intelligence()
+
     engine = {
 
         "jarvis_state": rt.state,
@@ -116,7 +118,7 @@ def get_status():
 
         "health": get_runtime_health(),
 
-        "error_intelligence": get_runtime_intelligence()
+        "error_intelligence": intel
 
     }
 
@@ -167,6 +169,8 @@ def get_status():
 
         "history": engine.get("history"),
 
+        "signal_history": rt.signal_history,
+
         "health": engine.get("health"),
 
         "last_request": rt.last_request,
@@ -175,7 +179,7 @@ def get_status():
 
         "error_history": rt.get_error_history(),
 
-        "error_intelligence": get_runtime_intelligence(),
+        "error_intelligence": intel,
 
         "runtime_events": rt.get_runtime_events()[-10:]
 

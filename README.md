@@ -14,7 +14,8 @@ Dieses Projekt ist kein Chatbot, sondern eine Runtime Engine für AI Execution.
 Runtime Core: Stable
 Error Intelligence: Stable
 Observability: Stable
-Architecture: Stabilized
+Decision Engine: Stable
+Auto Scaling: Stable
 
 Current Phase:
 
@@ -24,75 +25,66 @@ Next Phase:
 
 Phase 5 – Runtime Intelligence Expansion
 
-Project Direction:
+---
 
-Jarvis entwickelt sich zu einer Runtime Intelligence Engine
-mit Fokus auf Stabilität, Observability und deterministische Execution.
+# 🔥 Neue Features (aktuell)
 
-Project Direction:
-
-Jarvis entwickelt sich zu einem deterministischen AI Runtime System
-mit Fokus auf Stabilität, Transparenz und kontrollierte Execution.
-
-Nicht Ziel:
-
-Autonomous Agents
-Self modifying AI
-Unkontrollierte AI Behaviour
-
-Ziel:
-
-Runtime Infrastruktur.
+* Signal-basierte Runtime Intelligence
+* Stability Layer (Signal Confirmation)
+* Decision Engine (confidence / priority)
+* Action Mapping mit Cooldown
+* Signal Decay (Vergessen alter Zustände)
+* Worker Auto Scaling (up / down)
+* Error Backoff Protection
+* Thread-safe Worker Control
 
 ---
 
-# Runtime Dashboard
+# Runtime Verhalten
 
-Jarvis Runtime Status Interface:
+Jarvis arbeitet nach folgendem Prinzip:
 
-![Jarvis Dashboard](docs/dashboard.png)
+Signal
+→ Stability (Bestätigung)
+→ Decision (Bewertung)
+→ Action (Ausführung)
+
+---
 
 # Release Status
 
-Release: 0.2 – Runtime Hardening
+Release: 0.3 – Stable Runtime Engine
 
 Aktueller Stand:
 
-Stable Runtime Core
-Health Monitoring vorhanden
-Runtime Events vorhanden
-Error Tracking vorhanden
-Error Intelligence vorhanden
-Runtime Hardening abgeschlossen
-Dashboard vorhanden
-Runtime Intelligence Foundation vorhanden
-Engineering Phase System definiert
-
-Nächster Schritt:
-
-Phase 5 – Runtime Intelligence Layer
+* Stable Runtime Loop ✔
+* Scale Up (Queue Pressure) ✔
+* Scale Down (Idle Detection) ✔
+* Signal Stability ✔
+* Signal Decay ✔
+* Decision Filtering ✔
+* Cooldown System ✔
+* Error Backoff ✔
 
 ---
 
 # Projektziel
 
-Jarvis Core soll eine stabile AI Runtime Infrastruktur werden.
+Jarvis Core ist eine stabile Runtime Infrastruktur für AI Systeme.
 
 Fokus:
 
-Deterministische Execution
-Runtime Observability
-Health Intelligence
-Execution Control
-System Stability
+* Deterministische Execution
+* Runtime Observability
+* Health Intelligence
+* Execution Control
+* System Stability
 
 Nicht Fokus:
 
-Agent Behaviour
-Autonomous AI
-Self modifying Systems
-
-Jarvis soll Infrastruktur sein.
+* Autonomous Agents
+* Self modifying AI
+* Unkontrolliertes Verhalten
 
 ---
 
@@ -106,220 +98,40 @@ Runtime Layer
 Worker Loop
 Inference Engine
 
-Execution Flow:
+---
+
+# Execution Flow
 
 Request
 → Queue
 → Worker
 → Runtime Update
+→ Decision Engine
+→ Action System
 → Metrics
-→ History
-→ Idle
-
-Runtime Feedback Flow:
-
-Worker
-→ Error Intelligence
-→ Health Evaluation
-→ Status Service
 → Dashboard
 
 ---
 
-# Architecture Diagram
+# Runtime Feedback Flow
 
-Jarvis Runtime Flow:
-
-Client Request  
-→ Queue  
-→ Worker  
-→ Runtime State  
-→ Error Intelligence  
-→ Runtime Health  
-→ Status Service  
-→ Dashboard  
-
-Detailed runtime architecture:
-
-[Architecture Overview](docs/architecture.md)
-
-# Kern Komponenten
-
-Runtime Core:
-
-RuntimeState
-RuntimeWorker
-RuntimeHealth
-RuntimeErrors
-RuntimeAutomation
-
-Execution:
-
-Inference Engine
-Queue System
-Reasoning Engine
-
-Observability:
-
-Metrics
-Runtime Events
-Health System
-Dashboard
-
-Control:
-
-Status Service
-Runtime Service
-Inference Service
+Worker
+→ Runtime Intelligence
+→ Signal Generation
+→ Decision Engine
+→ Action Execution
+→ System Anpassung
 
 ---
 
 # Design Prinzipien
 
-Jarvis folgt festen Engineering Prinzipien:
-
-Stabilität vor Geschwindigkeit
-Observability vor Magie
-Determinismus vor Zufall
-Architektur vor Features
-Single Source of Truth
-Klare Ownership von State
-
-Jarvis soll erklärbar bleiben.
-
----
-
-# Engineering Workflow
-
-Jarvis wird in klaren Engineering Phasen entwickelt:
-
-Build Phase
-Hardening Phase
-Verification Phase
-Phase Completion
-
-Nach jeder abgeschlossenen Phase beginnt eine neue Engineering Session.
-
-Ziel:
-
-Kontext Drift verhindern
-Architektur Stabilität sichern
-Engineering Fokus erhalten
-
-Jarvis wird als Engineering System entwickelt.
-Nicht als Feature Sammlung.
-
----
-
-# Runtime Health System
-
-Health basiert auf:
-
-Error Rate
-Timeout Rate
-Queue Pressure
-Worker Status
-Slow Requests
-Error Categories
-
-Health States:
-
-healthy
-busy
-degraded
-error
-
-Health ist ein berechneter Zustand.
-Nicht manuell gesetzt.
-
----
-
-# Runtime Observability
-
-Jarvis verfolgt:
-
-Runtime State
-Worker Status
-Queue State
-Performance Metrics
-Errors
-Error Intelligence
-Runtime Events
-Request History
-
-Ziel:
-
-Runtime jederzeit verstehen können ohne Logs lesen zu müssen.
-
----
-
-# Runtime Events
-
-Jarvis speichert wichtige Runtime Aktionen:
-
-request_started
-request_finished
-request_error
-health_change
-worker_stall
-error_spike
-critical_error
-
-Das bildet die Grundlage für spätere Runtime Intelligence.
-
----
-
-# Aktuelle Features
-
-Runtime Worker Loop
-Health Monitoring
-Error Tracking
-Error Intelligence
-Metrics System
-Runtime Events
-Dashboard
-Docker Setup
-
----
-
-# Projektstruktur
-
-jarvis-core/
-
-ai/jarvis-ai/app/
-
-dashboard/
-inference/
-services/
-memory/
-config/
-error/
-
-scripts/
-
----
-
-# Start (lokal)
-
-Requirements:
-
-Docker
-Docker Compose
-Linux empfohlen
-
-Start:
-
-docker compose up -d
-
-Status prüfen:
-
-curl localhost:8002/status
-
-Dashboard:
-
-Browser öffnen:
-
-http://localhost:8002/dashboard/status.html
+* Stabilität vor Geschwindigkeit
+* Observability vor Magie
+* Determinismus vor Zufall
+* Architektur vor Features
+* Single Source of Truth
+* Klare State Ownership
 
 ---
 
@@ -333,74 +145,46 @@ Phase 5 – Runtime Intelligence Expansion (next)
 
 ---
 
-# Architektur Ziel
+# Start
 
-Jarvis soll werden:
+```bash
+docker compose up -d
+```
 
-Eine stabile AI Runtime.
+Status prüfen:
 
-Nicht:
+```bash
+curl localhost:8002/status
+```
 
-Ein AI Agent.
+Dashboard:
 
-Nicht:
-
-Ein autonomes System.
+http://localhost:8002/dashboard/status.html
 
 ---
 
 # Philosophie
 
-Jarvis wird gebaut wie:
+Jarvis ist gebaut wie:
 
-Ein Runtime Kernel
-Ein Scheduler
-Eine Datenbank Engine
-Ein Observability System
+* ein Runtime Kernel
+* ein Scheduler
+* ein Observability System
 
 Nicht wie:
 
-Ein Chatbot
-Ein AI Experiment
-Ein Spielzeug
-
----
-
-# Lizenz
-
-Aktuell keine Open Source Lizenz.
-
-Code dient als Architekturprojekt und Lernprojekt.
-
-Source sichtbar.
-Nutzung nicht freigegeben.
+* ein Chatbot
+* ein Experiment
+* ein Spielzeug
 
 ---
 
 # Status
 
-Jarvis Core:
+Jarvis Core ist aktuell eine stabile, signalbasierte Runtime Engine
+mit funktionierender Entscheidungslogik und automatischer Skalierung.
 
-Runtime Foundation erreicht.
-Error Intelligence stabilisiert.
+Nächster Schritt:
 
-Nächster Meilenstein:
-
-Runtime Intelligence Layer.
-
----
-
-# Usage
-
-This repository is currently source-visible only.
-
-Purpose:
-
-Architecture documentation
-Learning reference
-Development history
-
-Not intended for production use or redistribution.
-
-License may be added in future versions.
+Phase 5 – Lernen und adaptive Entscheidungen
 

@@ -16,7 +16,35 @@ from orchestrator.command_router import CommandRouter
 from services.status_service import get_status
 from pathlib import Path
 
+from decision_engine.action_executor import set_runtime_worker
+
 import threading
+
+import logging
+import os
+from datetime import datetime
+
+logger = logging.getLogger("jarvis")
+
+if not logger.handlers:
+
+    logger.setLevel(logging.INFO)
+
+    formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
+
+    os.makedirs("logs", exist_ok=True)
+
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    log_file = f"logs/jarvis_{timestamp}.log"
+
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setFormatter(formatter)
+
+    logger.addHandler(console_handler)
+    logger.addHandler(file_handler)
 
 BASE = Path(__file__).resolve().parent
 
@@ -30,7 +58,11 @@ def startup_event():
 
     print("Model loaded")
 
+    from decision_engine.action_executor import set_runtime_worker
+
     runtime_worker = RuntimeWorker()
+
+    set_runtime_worker(runtime_worker)
 
     worker_thread = threading.Thread(
         target=runtime_worker.start,
@@ -38,6 +70,7 @@ def startup_event():
     )
 
     worker_thread.start()
+
 
 @app.get("/health")
 def health():
