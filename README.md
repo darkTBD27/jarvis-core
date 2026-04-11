@@ -42,7 +42,7 @@ Phase 5 – Runtime Intelligence Expansion
 
 # Dashboard
 
-![Jarvis Dashboard](docs/images/dashboard.png)
+![Jarvis Dashboard](docs/dashboard.png)
 
 The dashboard provides real-time insight into:
 
