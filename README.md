@@ -40,6 +40,19 @@ Phase 5 – Runtime Intelligence Expansion
 
 ---
 
+# Dashboard
+
+![Jarvis Dashboard](docs/images/dashboard.png)
+
+The dashboard provides real-time insight into:
+
+- Runtime state
+- Worker activity
+- Signal history
+- System health
+
+---
+
 # Runtime Verhalten
 
 Jarvis arbeitet nach folgendem Prinzip:
