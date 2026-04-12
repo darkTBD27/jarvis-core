@@ -22,7 +22,7 @@ class SystemTool(JarvisTool):
 
                 "state":runtime.state,
 
-                "health":runtime.health_state,
+                "health":runtime.health,
 
                 "queue":runtime.queue_size
 

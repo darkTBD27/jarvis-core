@@ -45,6 +45,10 @@ class RuntimeState:
 
         self.history = []
 
+        self.outcomes = []
+
+        self.MAX_OUTCOME_HISTORY = 200
+
         self.worker_heartbeat = time.time()
 
         self.worker_last_activity = time.time()
@@ -80,7 +84,7 @@ class RuntimeState:
 
     def set_health(self,state):
 
-        self.health_state = state
+        self.health = state
 
 
     def get_health(self):
@@ -167,7 +171,7 @@ class RuntimeState:
 
         if now - self.worker_heartbeat > 10:
 
-            self.health_state = "degraded"
+            self.health = "degraded"
 
             return "stalled"
 
@@ -238,6 +242,14 @@ class RuntimeState:
             self.signal_history.pop(0)
 
         self.signal_history.append(entry)
+
+
+    def add_outcome(self, outcome):
+
+        if len(self.outcomes) >= self.MAX_OUTCOME_HISTORY:
+            self.outcomes.pop(0)
+
+        self.outcomes.append(outcome)
 
 
 RUNTIME = RuntimeState()

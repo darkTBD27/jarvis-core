@@ -1,186 +1,155 @@
+# ============================================================
+# STATUS SERVICE
+# ------------------------------------------------------------
+# Zweck:
+# Liefert aktuellen Runtime-Zustand für Dashboard
+#
+# Enthält:
+# - Runtime State
+# - Worker Status
+# - Performance
+# - Errors
+# - Signals
+# - Learning (Action Verhalten)
+# ============================================================
+
 from inference.runtime_health import get_runtime_health
 from inference.runtime_health import get_error_intelligence
 
 from inference.runtime_object import get_runtime
 
-from inference.runtime_state import get_last_error
-from inference.runtime_state import get_error_types
-
 from inference.runtime_intelligence import get_runtime_intelligence
+
+from learning_store import get_learning_state
+
+
+# ============================================================
+# MAIN ENTRY
+# ============================================================
 
 def get_status():
 
     rt = get_runtime()
 
-    intel = get_runtime_intelligence()
+    intelligence = get_runtime_intelligence()
+    learning = get_learning_state()
 
-    engine = {
+    # ========================================================
+    # CORE STATE
+    # ========================================================
 
-        "jarvis_state": rt.state,
-
+    core = {
+        "state": rt.state,
         "uptime": rt.get_uptime(),
-
         "busy": rt.busy,
+        "health": get_runtime_health()
+    }
 
-        "queue": rt.queue_size,
+    # ========================================================
+    # WORKER
+    # ========================================================
 
-        "queue_limit": 0,
+    worker = {
+        "status": rt.get_worker_status(),
+        "heartbeat_age": rt.get_worker_heartbeat_age(),
+        "last_activity": rt.get_worker_last_activity_age()
+    }
 
-        "current_request": rt.current_request,
+    # ========================================================
+    # QUEUE
+    # ========================================================
 
-        "queued_requests": [],
+    queue = {
+        "size": rt.queue_size,
+        "limit": 0
+    }
 
-        "last_tool": "none",
+    # ========================================================
+    # PERFORMANCE
+    # ========================================================
 
-        "worker_status": rt.get_worker_status(),
-
-        "worker_heartbeat_age": rt.get_worker_heartbeat_age(),
-
-        "worker_last_activity": rt.get_worker_last_activity_age(),
-
-        "errors": rt.metric_get("requests_error"),
-
-        "timeouts": rt.metric_get("requests_timeout"),
-
-        "success_requests": rt.metric_get("requests_success"),
-
-        "total_requests": rt.metric_get("requests_total"),
-
+    performance = {
         "tokens_per_sec": rt.metric_get("tokens_per_sec"),
-
         "last_duration": rt.metric_get("last_duration"),
-
         "avg_duration": rt.metric_get("avg_duration"),
+        "total_requests": rt.metric_get("requests_total"),
+        "success_requests": rt.metric_get("requests_success"),
+        "slow_requests": rt.metric_get("slow_requests")
+    }
 
-        "last_success_request": rt.metric_get("last_success_request"),
+    # ========================================================
+    # ERRORS
+    # ========================================================
 
+    errors = {
         "last_error": rt.get_last_error(),
-
         "error_types": rt.get_error_types(),
+        "error_history": rt.get_error_history(),
+        "timeouts": rt.metric_get("requests_timeout")
+    }
 
-        "last_event": None,
+    # ========================================================
+    # ACTIVITY
+    # ========================================================
 
+    activity = {
+        "current_request": rt.current_request,
+        "last_request": rt.last_request,
         "history": rt.history,
-
-        "health": rt.get_health(),
-
-        "error_types": rt.get_error_types(),
-
-        "last_error": rt.get_last_error(),
-
         "runtime_events": rt.get_runtime_events()[-10:]
-
     }
 
-    status = {
+    # ========================================================
+    # SIGNALS
+    # ========================================================
 
-        "jarvis":{
-
-            "state": engine.get("jarvis_state","unknown"),
-
-            "uptime": engine.get("uptime",0)
-
-        },
-
-        "busy": engine.get("busy",False),
-
-        "queue": engine.get("queue",0),
-
-        "queue_limit": engine.get("queue_limit",0),
-
-        "current_request": engine.get("current_request"),
-
-        "queued_requests": engine.get("queued_requests",[]),
-
-        "last_tool": engine.get("last_tool","none"),
-
-        "errors": engine.get("errors",0),
-
-        "timeouts": engine.get("timeouts",0),
-
-        "success_requests": engine.get("success_requests",0),
-
-        "total_requests": engine.get("total_requests",0),
-
-        "tokens_per_sec": engine.get("tokens_per_sec",0),
-
-        "last_duration": engine.get("last_duration",0),
-
-        "avg_duration": engine.get("avg_duration",0),
-
-        "last_success_request": engine.get("last_success_request"),
-
-        "last_error": engine.get("last_error"),
-
-        "last_event": engine.get("last_event"),
-
-        "history": engine.get("history",[]),
-
-        "health": get_runtime_health(),
-
-        "error_intelligence": intel
-
+    signals = {
+        "signal_history": rt.signal_history
     }
+
+    # ========================================================
+    # FINAL RESPONSE
+    # ========================================================
 
     return {
 
-        "jarvis":{
-            "state": engine.get("jarvis_state"),
-            "uptime": engine.get("uptime")
+        "jarvis": {
+            "state": core["state"],
+            "uptime": core["uptime"]
         },
 
-        "busy": engine.get("busy"),
+        "busy": core["busy"],
+        "health": core["health"],
 
-        "queue": engine.get("queue"),
+        "queue": queue["size"],
+        "queue_limit": queue["limit"],
 
-        "queue_limit": engine.get("queue_limit"),
+        "worker_status": worker["status"],
+        "worker_heartbeat_age": worker["heartbeat_age"],
+        "worker_last_activity": worker["last_activity"],
 
-        "current_request": engine.get("current_request"),
+        "current_request": activity["current_request"],
+        "last_request": activity["last_request"],
 
-        "queued_requests": engine.get("queued_requests"),
+        "history": activity["history"],
+        "runtime_events": activity["runtime_events"],
 
-        "last_tool": engine.get("last_tool"),
+        "tokens_per_sec": performance["tokens_per_sec"],
+        "last_duration": performance["last_duration"],
+        "avg_duration": performance["avg_duration"],
+        "total_requests": performance["total_requests"],
+        "success_requests": performance["success_requests"],
+        "slow_requests": performance["slow_requests"],
 
-        "worker_status": engine.get("worker_status"),
+        "last_error": errors["last_error"],
+        "error_types": errors["error_types"],
+        "error_history": errors["error_history"],
+        "timeouts": errors["timeouts"],
 
-        "worker_heartbeat_age": engine.get("worker_heartbeat_age"),
+        "error_intelligence": intelligence,
 
-        "worker_last_activity": engine.get("worker_last_activity"),
+        "signal_history": signals["signal_history"],
 
-        "errors": engine.get("errors"),
-
-        "timeouts": engine.get("timeouts"),
-
-        "success_requests": engine.get("success_requests"),
-
-        "total_requests": engine.get("total_requests"),
-
-        "tokens_per_sec": engine.get("tokens_per_sec"),
-
-        "last_duration": engine.get("last_duration"),
-
-        "avg_duration": engine.get("avg_duration"),
-
-        "last_success_request": engine.get("last_success_request"),
-
-        "last_error": engine.get("last_error"),
-
-        "last_event": engine.get("last_event"),
-
-        "history": engine.get("history"),
-
-        "signal_history": rt.signal_history,
-
-        "health": engine.get("health"),
-
-        "last_request": rt.last_request,
-
-        "error_types": rt.get_error_types(),
-
-        "error_history": rt.get_error_history(),
-
-        "error_intelligence": intel,
-
-        "runtime_events": rt.get_runtime_events()[-10:]
-
+        # LEARNING
+        "learning": learning
     }

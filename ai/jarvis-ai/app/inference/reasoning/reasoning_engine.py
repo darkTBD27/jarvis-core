@@ -17,7 +17,7 @@ class ReasoningEngine:
 
             "state":self.runtime.state,
 
-            "health":self.runtime.health_state,
+            "health":self.runtime.health,
 
             "queue":self.runtime.queue_size,
 

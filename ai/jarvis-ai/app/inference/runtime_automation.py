@@ -8,7 +8,7 @@ def check_runtime_triggers():
     triggers = []
 
 
-    if runtime.health_state == "error":
+    if runtime.health == "error":
 
         triggers.append("runtime_error")
 

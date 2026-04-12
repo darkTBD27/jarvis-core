@@ -1,6 +1,8 @@
 from inference.queue_system import dequeue_request, queue_empty, queue_size
 from inference.inference import run_inference
 
+from engine.logger import logger
+
 from inference.runtime_object import get_runtime
 from inference.runtime_health import calculate_health
 from inference.runtime_automation import run_automation, check_runtime_triggers
@@ -18,21 +20,18 @@ from decision_engine.action_executor import execute_action
 
 from inference.inference_lock import inference_lock
 
+from inference.runtime_outcome import create_outcome
+from outcome_evaluator import evaluate_outcome
+from learning_store import update_learning, get_action_stats
 
 import time
-import traceback
-import logging
 import threading
-import logging
 
 
 # --- WORKER CONTROL ---
-worker_threads = []  # [(thread, control_flag)]
+worker_threads = []
 worker_target_count = 1
 MAX_WORKERS = 3
-
-
-logger = logging.getLogger("jarvis")
 
 
 class RuntimeWorker:
@@ -69,7 +68,6 @@ class RuntimeWorker:
 
                 logger.exception("Worker Error")
 
-                # --- ERROR TRACKING ---
                 now = time.time()
 
                 if self.last_error_time and (now - self.last_error_time < 10):
@@ -79,7 +77,6 @@ class RuntimeWorker:
 
                 self.last_error_time = now
 
-                # --- BACKOFF ---
                 sleep_time = min(5 * self.error_count, 30)
 
                 logger.warning(f"[WORKER] error_backoff count={self.error_count} sleep={sleep_time}s")
@@ -192,7 +189,61 @@ class RuntimeWorker:
 
                 if action:
                     logger.warning(f"[ACTION] {action}")
-                    execute_action(action)
+
+                    start_time = time.time()
+                    success = True
+                    error_type = None
+
+                    try:
+                        execute_action(action)
+                    except Exception as e:
+                        success = False
+                        error_type = type(e).__name__
+                        logger.warning(f"[ACTION ERROR] {action} | error={error_type}")
+
+                    end_queue = queue_size()
+
+                    outcome = create_outcome(
+                        request_id=request_id,
+                        decision_id="runtime_decision",
+                        action_type=action,
+                        start_time=start_time,
+                        success=success,
+                        error_type=error_type,
+                        queue_before=current_queue_size,
+                        queue_after=end_queue,
+                        worker_before=self.runtime.worker_status,
+                        worker_after=self.runtime.worker_status,
+                        system_state_hash="na"
+                    )
+
+                    self.runtime.add_outcome(outcome)
+
+                    result = evaluate_outcome(outcome)
+                    update_learning(action, result, outcome)
+
+                    logger.info(
+                        f"[OUTCOME] action={action} "
+                        f"success={success} "
+                        f"result={result} "
+                        f"queue={current_queue_size}->{end_queue} "
+                        f"time={round(outcome.execution_time, 2)}s"
+                    )
+
+                    if result == "BAD":
+                        logger.warning(
+                            f"[LEARNING WARNING] BAD ACTION detected | action={action} "
+                            f"queue={current_queue_size}->{end_queue} "
+                            f"time={round(outcome.execution_time, 2)}s "
+                            f"error={error_type}"
+                        )
+
+                    stats = get_action_stats(action)
+
+                    logger.info(
+                        f"[LEARNING STATS] {action} "
+                        f"G={stats['GOOD']} B={stats['BAD']} N={stats['NEUTRAL']}"
+                    )
 
         except Exception as e:
             logger.warning(f"[DECISION ERROR] {e}")
@@ -212,8 +263,6 @@ class RuntimeWorker:
         self.runtime.worker_status = "running"
 
         logger.info("[WORKER] started")
-        logger.info("[WORKER] processing")
-        logger.info("[WORKER] idle")
 
         for _ in range(worker_target_count):
             self.start_worker_thread()

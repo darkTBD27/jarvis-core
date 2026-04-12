@@ -1,17 +1,36 @@
+# ============================================================
+# RUNTIME INTELLIGENCE
+# ------------------------------------------------------------
+# Zweck:
+# Analysiert Runtime Zustand und erzeugt Signals
+#
+# INPUT:
+# Runtime State + Errors + Queue
+#
+# OUTPUT:
+# Signals (keine Decisions, keine Actions!)
+# ============================================================
+
 from inference.runtime_errors import get_recent_error_count
 from inference.runtime_object import get_runtime
-from inference.queue_system import get_queue_size
 
 import time
+import logging
+
+logger = logging.getLogger("jarvis")
+
+# ============================================================
+# CONFIG
+# ============================================================
 
 signal_memory = {}
+
 SIGNAL_STABILITY_THRESHOLD = 2
 SIGNAL_WINDOW = 10  # Sekunden
 
-
-# -------------------------
-# ANALYSIS
-# -------------------------
+# ============================================================
+# ANALYSIS LAYER
+# ============================================================
 
 def analyze_error_patterns():
     return {
@@ -52,6 +71,7 @@ def detect_error_trend():
 
     if last_min > last_5min / 5:
         return "increasing"
+
     if last_min < last_5min / 10:
         return "decreasing"
 
@@ -69,43 +89,101 @@ def detect_instability(trend):
 
     return "stable"
 
-
-# -------------------------
-# SIGNAL HELPERS
-# -------------------------
+# ============================================================
+# SIGNAL CORE
+# ============================================================
 
 def create_signal(signal_type):
 
     now = time.time()
 
-    # alte Einträge bereinigen
     entries = signal_memory.get(signal_type, [])
     entries = [t for t in entries if now - t < SIGNAL_WINDOW]
 
-    # neuen Eintrag hinzufügen
     entries.append(now)
     signal_memory[signal_type] = entries
 
     stable = len(entries) >= SIGNAL_STABILITY_THRESHOLD
 
-    return {
+    signal = {
         "type": signal_type,
         "timestamp": now,
         "source": "runtime_intelligence",
         "stable": stable
     }
 
+    logger.info(f"[SIGNAL] {signal_type} stable={stable}")
+
+    return signal
+
+
+# ============================================================
+# SIGNAL DETECTORS
+# ============================================================
 
 def detect_queue_pressure(queue_size):
     if queue_size > 2:
         return create_signal("QUEUE_PRESSURE")
-
     return None
 
 
-# -------------------------
-# MAIN INTELLIGENCE
-# -------------------------
+# ============================================================
+# SIGNAL GENERATION
+# ============================================================
+
+def generate_runtime_signals(runtime, intelligence):
+
+    signals = []
+
+    queue = runtime.queue_size
+    worker = runtime.get_worker_status()
+
+    # --- QUEUE ---
+    queue_signal = detect_queue_pressure(queue)
+    if queue_signal:
+        signals.append(queue_signal)
+
+    # --- WORKER ---
+    if worker == "stalled":
+        signals.append(create_signal("WORKER_STALLED"))
+
+    # --- LOAD ---
+    if runtime.is_busy() and queue > 3:
+        signals.append(create_signal("RUNTIME_OVERLOAD"))
+
+    # --- IDLE ---
+    if not runtime.is_busy() and queue == 0:
+        signals.append(create_signal("RUNTIME_IDLE"))
+
+    # --- RISK ---
+    if intelligence["risk_level"] == "high":
+        signals.append(create_signal("RUNTIME_RISK_HIGH"))
+
+    # --- INSTABILITY ---
+    if intelligence["instability"] == "critical":
+        signals.append(create_signal("RUNTIME_INSTABILITY"))
+
+    # --- TREND ---
+    if intelligence["error_trend"] == "increasing":
+        signals.append(create_signal("ERROR_TREND_UP"))
+
+    elif intelligence["error_trend"] == "decreasing":
+        signals.append(create_signal("ERROR_RECOVERY"))
+
+    # --- STABILITY DROP ---
+    if intelligence["stability_score"] < 60:
+        signals.append(create_signal("STABILITY_DROP"))
+
+    # --- FALLBACK ---
+    if not signals:
+        signals.append(create_signal("RUNTIME_IDLE"))
+
+    return signals
+
+
+# ============================================================
+# MAIN ENTRY
+# ============================================================
 
 def get_runtime_intelligence():
 
@@ -127,58 +205,6 @@ def get_runtime_intelligence():
 
     intelligence["signals"] = signals
 
+    logger.info(f"[INTELLIGENCE] signals={len(signals)}")
+
     return intelligence
-
-
-# -------------------------
-# SIGNAL GENERATION
-# -------------------------
-
-def generate_runtime_signals(runtime, intelligence):
-
-    signals = []
-
-    queue = get_queue_size()
-    worker = runtime.get_worker_status()
-
-    # --- QUEUE ---
-    queue_size = get_queue_size()
-    queue_signal = detect_queue_pressure(queue)
-    if queue_signal:
-        signals.append(queue_signal)
-
-    # --- WORKER ---
-    if worker == "stalled":
-        signals.append(create_signal("WORKER_STALLED"))
-
-    # --- LOAD ---
-    if runtime.is_busy() and queue > 3:
-        signals.append(create_signal("RUNTIME_OVERLOAD"))
-
-    # --- IDLE / SCALE DOWN ---
-    if not runtime.is_busy() and queue == 0:
-        signals.append(create_signal("RUNTIME_IDLE"))
-
-    # --- RISK ---
-    if intelligence["risk_level"] == "high":
-        signals.append(create_signal("RUNTIME_RISK_HIGH"))
-
-    if intelligence["instability"] == "critical":
-        signals.append(create_signal("RUNTIME_INSTABILITY"))
-
-    # --- TREND ---
-    if intelligence["error_trend"] == "increasing":
-        signals.append(create_signal("ERROR_TREND_UP"))
-
-    if intelligence["error_trend"] == "decreasing":
-        signals.append(create_signal("ERROR_RECOVERY"))
-
-    # --- STABILITY ---
-    if intelligence["stability_score"] < 60:
-        signals.append(create_signal("STABILITY_DROP"))
-
-    # --- FALLBACK ---
-    if not signals:
-        signals.append(create_signal("RUNTIME_IDLE"))
-
-    return signals
