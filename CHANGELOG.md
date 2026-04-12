@@ -4,88 +4,153 @@ All notable changes to Jarvis Core are documented here.
 
 ---
 
-# Phase 4.1 – Stable Runtime Decision Engine (Current)
+# Current State – Controlled Adaptive Runtime
 
-Date: 2026.April.11
+Date: 2026.April.12
+
+---
 
 ## Runtime Evolution
 
-Jarvis evolved from passive runtime monitoring into an active,
-decision-driven runtime system with autonomous scaling behavior.
+Jarvis evolved from:
+
+Passive monitoring system
+→ Decision-driven runtime
+→ Controlled adaptive runtime
+
+The system now:
+
+* Observes runtime behavior
+* Makes structured decisions
+* Executes controlled actions
+* Evaluates outcomes
+* Learns from real execution data
 
 ---
 
 ## Added
 
-### Decision Engine
+### Outcome System
 
-* Signal → Decision → Action pipeline
-* Decision object with confidence & priority
-* Decision filtering (quality gate)
+* Structured outcome generation per action
+* Tracks:
 
-### Signal Stability Layer
+  * Success / Failure
+  * Execution Time
+  * Queue Impact
+  * Error Impact
+  * Stability Change
+* Outcome linked to decision and action
 
-* Signal confirmation mechanism (multi-hit validation)
-* Stable signal detection before action
+---
 
-### Signal Decay
+### Learning System
 
-* Automatic reset of outdated signals
-* Time-based signal invalidation
+* Passive learning from outcomes
+* Context-based action scoring:
 
-### Action System
+  * queue_low
+  * queue_medium
+  * queue_high
+* Tracks:
 
-* Action mapping (signal → runtime action)
-* Worker scaling (up/down)
-* Restart logic for stalled workers
+  * GOOD
+  * BAD
+  * NEUTRAL
+* No direct runtime control
 
-### Cooldown System
+---
 
-* Action cooldown per type
-* Prevents rapid repeated execution
+### Learning Integration (Controlled)
 
-### Error Protection
+* Learning influences:
 
-* Worker error backoff (adaptive sleep)
-* Crash loop prevention
+  * Decision confidence (small bias)
+  * Decision priority (bounded adjustment)
+* Influence is:
+
+  * Limited
+  * Observable
+  * Non-destructive
+
+---
+
+### Balanced Decision Logic
+
+* Replaced hard filters with score-based evaluation
+* Multiple weak signals can trigger valid decisions
+* Reduced over-filtering of actions
+
+---
+
+### Action Observability
+
+* Action → Outcome → Learning fully traceable
+* Enables full system feedback loop visibility
 
 ---
 
 ## Changed
 
+### Decision Behavior
+
+Before:
+
+* Hard thresholds blocked most actions
+
+Now:
+
+* Weighted scoring allows controlled triggering
+* System reacts more naturally to runtime conditions
+
+---
+
 ### Runtime Behavior
 
-* System now reacts only to confirmed signals
-* Reduced noise and false positives
-* More predictable scaling behavior
+* More responsive under load
+* Maintains deterministic control
+* No uncontrolled scaling behavior
 
-### Worker System
+---
 
-* Multi-thread capable scaling
-* Controlled worker lifecycle
-* Safe downscaling with thread control flags
+### Architecture Model
 
-### Logging
+Extended flow:
 
-* Centralized logging system (jarvis logger)
-* Structured runtime debug output
+Worker
+→ Signal
+→ Decision
+→ Action
+→ Outcome
+→ Learning
+→ Decision Adjustment
 
 ---
 
 ## Fixed
 
-### Stability Fixes
+### Learning Pipeline Issues
 
-* Decision pipeline crash due to missing variables
-* Action mapper execution blocking
-* Logging inconsistencies across modules
-* Runtime worker thread safety improvements
+* Missing learning updates after actions
+* Incorrect context mapping (queue levels)
+* Learning not visible in dashboard
 
-### Architecture Fixes
+---
 
-* Removed duplicate logic paths
-* Cleaned action mapping structure
-* Fixed decision object field mismatch
+### Dashboard Integration
+
+* Fixed learning data visibility
+* Fixed JSON structure mismatch (`inference.engine`)
+* Fixed DOM rendering issues
+* Stabilized auto-refresh loop
+
+---
+
+### Decision Pipeline Stability
+
+* Fixed action suppression due to over-filtering
+* Fixed missing action triggers under valid conditions
+* Improved signal-to-action consistency
 
 ---
 
@@ -93,65 +158,74 @@ decision-driven runtime system with autonomous scaling behavior.
 
 Jarvis is now:
 
-* Stable under load ✔
-* Self-regulating ✔
-* Predictable ✔
+* Deterministic ✔
 * Observable ✔
-* Extendable ✔
+* Signal-driven ✔
+* Decision-based ✔
+* Action-controlled ✔
+* Outcome-aware ✔
+* Learning-enabled (controlled) ✔
+* Stable under load ✔
 
 ---
 
-# Phase 4 – Error Intelligence Layer
+## System Capability
 
-(previous)
+Jarvis can now:
 
-* Error classification system
-* Error pattern detection
-* Runtime health intelligence
-
----
-
-# Phase 3 – Runtime Observability Layer
-
-(previous)
-
-* Runtime dashboard
-* Worker monitoring
-* Performance tracking
+* React to runtime conditions
+* Execute controlled scaling
+* Evaluate action effectiveness
+* Learn preferred behavior
+* Adjust decisions over time
 
 ---
 
-# Phase 2 – Runtime Core
+## Current Focus
 
-(previous)
+Controlled adaptive behavior.
 
-* Worker loop
-* Runtime state management
-* Request lifecycle
-
----
-
-# Phase 1 – Foundation
-
-(previous)
-
-* Initial runtime system
-* Basic inference integration
+Learning improves decisions
+without compromising stability.
 
 ---
 
-# Future Direction
+## Future Direction
 
-## Phase 5 – Runtime Intelligence Layer
+### Adaptive Runtime (Controlled)
 
-* Decision learning
-* Adaptive scaling behavior
-* Signal weighting
-* Predictive runtime adjustments
+* Fine-tuned decision bias
+* Context-aware scaling behavior
+* Improved signal weighting
 
-## Phase 6 – Adaptive Runtime
+---
 
-* Self-stabilizing runtime
-* Learning-based decision system
-* Autonomous optimization
+### Advanced Learning
+
+* Multi-context evaluation (queue + worker + errors)
+* Long-term pattern detection
+* Risk-aware decision adjustment
+
+---
+
+### Safety Expansion
+
+* Stronger adaptive limits
+* Risk-based bias scaling
+* Learning validation layer
+
+---
+
+# Final Note
+
+Jarvis is no longer:
+
+A reactive system.
+
+Jarvis is now:
+
+A controlled adaptive runtime system.
+
+Learning enhances decisions.
+Runtime remains in control.
 

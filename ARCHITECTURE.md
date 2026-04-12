@@ -1,6 +1,6 @@
 # JARVIS CORE ARCHITECTURE
 
-Jarvis Core is a deterministic AI runtime designed as infrastructure,
+Jarvis Core is a deterministic runtime intelligence system built as infrastructure,
 not as a chatbot.
 
 ---
@@ -15,6 +15,8 @@ API Layer
 → Signal System
 → Decision Engine
 → Action System
+→ Outcome System (NEW)
+→ Learning System (NEW)
 → Metrics
 → Health Intelligence
 → Dashboard
@@ -62,6 +64,8 @@ Worker
 → Decision Engine
 → Action Mapping
 → Action Execution
+→ Outcome Evaluation (NEW)
+→ Learning Update (NEW)
 → Runtime adapts
 
 ---
@@ -78,8 +82,90 @@ Signal
 Rules:
 
 * No action without confirmed signal
+* No action without stability validation
 * No action without quality threshold
 * No action without cooldown
+* No action without observability
+
+---
+
+# Outcome System (NEW)
+
+Every action produces a structured outcome.
+
+Outcome consists of:
+
+* Success / Failure
+* Execution Time
+* Error Impact
+* System Stability Change
+* Queue Impact
+
+Rules:
+
+* Outcome must always be recorded
+* Outcome must be traceable to action
+* Outcome must be immutable
+
+---
+
+# Learning System (NEW)
+
+Learning is a passive analysis system.
+
+Learning may:
+
+* Analyze historical outcomes
+* Detect patterns
+* Generate action performance scores
+
+Learning may NOT:
+
+* Directly execute actions
+* Override decisions
+* Modify runtime state
+
+Learning influence is limited to:
+
+* Confidence adjustment
+* Priority adjustment
+
+---
+
+# Learning Safety Rule
+
+Learning is strictly controlled.
+
+* No direct runtime intervention
+* No action override
+* No state mutation
+
+Learning only influences decision parameters indirectly.
+
+---
+
+# Adaptive Limit Rule
+
+All adaptive behavior must be bounded.
+
+* Confidence has min/max limits
+* Priority has min/max limits
+* Adjustments are incremental
+* Cooldown required between adjustments
+
+No sudden jumps allowed.
+
+---
+
+# Decision Adaptation Rule (NEW)
+
+Learning may influence decisions ONLY via bounded bias.
+
+Rules:
+
+* Bias must be small and controlled
+* Bias must never override thresholds
+* Bias must remain observable
 
 ---
 
@@ -115,6 +201,7 @@ Jarvis is designed to:
 * Confirm patterns
 * Make controlled decisions
 * Execute minimal necessary actions
+* Learn from outcomes
 
 ---
 
@@ -125,6 +212,21 @@ Jarvis is designed to:
 3 Determinism
 4 Intelligence
 5 Automation
+
+---
+
+# Observability Rule
+
+Everything must be measurable.
+
+* Runtime state
+* Signals
+* Decisions
+* Actions
+* Outcomes
+* Learning
+
+A system without visibility is unsafe.
 
 ---
 
@@ -150,7 +252,9 @@ Jarvis is now:
 
 * Signal-driven ✔
 * Decision-based ✔
-* Self-regulating ✔
+* Action-controlled ✔
+* Outcome-aware ✔
+* Learning-enabled (controlled) ✔
 * Observable ✔
 * Deterministic ✔
 
@@ -158,16 +262,24 @@ Jarvis is now:
 
 # Future Architecture Direction
 
-## Phase 5 – Runtime Intelligence Layer
-
-* Decision memory
-* Adaptive behavior
-* Signal weighting
-* Pattern learning
-
-## Phase 6 – Adaptive Runtime
+## Adaptive Runtime (Controlled)
 
 * Self stabilization
-* Autonomous optimization
+* Adaptive decision tuning
+* Pattern recognition
+
+## Autonomous Behavior (Bounded)
+
 * Predictive system behavior
+* Risk-aware decisions
+* Stability-first optimization
+
+---
+
+# Final Principle
+
+Learning must never replace control.
+Learning must only enhance decisions.
+
+Runtime always remains in control.
 

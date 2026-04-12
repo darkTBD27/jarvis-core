@@ -281,6 +281,96 @@ Not the rule.
 
 Jarvis Core Engineering Law.
 
+---
+
+# LEARNING CONTROL LAW
+
+Learning is a strictly passive system layer.
+
+Learning must never execute, control, or override runtime behavior.
+
+---
+
+## ALLOWED
+
+Learning may:
+
+* Analyze historical outcomes
+* Derive statistical patterns
+* Produce action performance scores
+
+Learning exists only to support decision evaluation.
+
+---
+
+## FORBIDDEN
+
+Learning must NEVER:
+
+* Trigger actions
+* Override decisions
+* Modify runtime state
+* Inject hidden logic
+* Bypass decision thresholds
+
+Any violation is considered architecture breakage.
+
+---
+
+## CONTROLLED INFLUENCE
+
+Learning influence is strictly limited to:
+
+* Bounded confidence adjustment
+* Bounded priority adjustment
+
+Constraints:
+
+* Must remain within defined min/max limits
+* Must be incremental (no jumps)
+* Must respect cooldown mechanisms
+* Must remain fully observable
+
+Learning may influence decisions.
+
+Learning must never control them.
+
+---
+
+## ENFORCEMENT RULE
+
+If learning behavior becomes:
+
+* Non-deterministic
+* Non-observable
+* Unbounded
+
+Then:
+
+Learning must be disabled immediately.
+
+---
+
+## REASON
+
+Uncontrolled learning introduces:
+
+Hidden behavior
+State instability
+Non-deterministic execution
+
+This violates core system principles.
+
+---
+
+## FINAL LAW
+
+Runtime is the authority.
+
+Learning is advisory.
+
+Control is absolute.
+
 
 # DEUTSCHE VERSION
 
@@ -558,4 +648,94 @@ Nicht die Regel.
 ---
 
 Jarvis Core Engineering Gesetzbuch.
+
+---
+
+# LEARNING CONTROL GESETZ
+
+Learning ist eine strikt passive Systemschicht.
+
+Learning darf niemals Runtime Verhalten ausführen, steuern oder überschreiben.
+
+---
+
+## ERLAUBT
+
+Learning darf:
+
+* Vergangene Outcomes analysieren
+* Statistische Muster ableiten
+* Action Performance bewerten
+
+Learning existiert ausschließlich zur Unterstützung von Entscheidungen.
+
+---
+
+## VERBOTEN
+
+Learning darf NIEMALS:
+
+* Actions auslösen
+* Entscheidungen überschreiben
+* Runtime State verändern
+* Versteckte Logik einbringen
+* Decision Thresholds umgehen
+
+Jeder Verstoß gilt als Architekturbruch.
+
+---
+
+## KONTROLLIERTER EINFLUSS
+
+Der Einfluss von Learning ist strikt begrenzt auf:
+
+* Begrenzte Anpassung von Confidence
+* Begrenzte Anpassung von Priority
+
+Einschränkungen:
+
+* Innerhalb definierter Min/Max Grenzen
+* Schrittweise Anpassung (keine Sprünge)
+* Cooldown muss eingehalten werden
+* Vollständig beobachtbar
+
+Learning darf Entscheidungen beeinflussen.
+
+Learning darf sie niemals steuern.
+
+---
+
+## DURCHSETZUNGSREGEL
+
+Wenn Learning:
+
+* Nicht-deterministisch wird
+* Nicht beobachtbar wird
+* Unkontrolliert wächst
+
+Dann gilt:
+
+Learning muss sofort deaktiviert werden.
+
+---
+
+## BEGRÜNDUNG
+
+Unkontrolliertes Learning führt zu:
+
+Verstecktem Verhalten
+State Instabilität
+Nicht-deterministischem Systemverhalten
+
+Das verletzt die Kernprinzipien.
+
+---
+
+## ABSOLUTES GESETZ
+
+Runtime hat die Kontrolle.
+
+Learning ist beratend.
+
+Kontrolle ist nicht verhandelbar.
 

@@ -1,42 +1,110 @@
 # Jarvis Core
 
-Deterministic AI Runtime Infrastructure
+Deterministic Runtime Intelligence Infrastructure
 
-Jarvis Core ist eine lokale AI Runtime Architektur mit Fokus auf Stabilität,
-Observability und kontrollierte Execution anstatt autonomem Verhalten.
+Jarvis Core ist eine lokale Runtime Engine für AI Execution mit Fokus auf:
 
-Dieses Projekt ist kein Chatbot, sondern eine Runtime Engine für AI Execution.
+* Stabilität
+* Observability
+* deterministische Entscheidungen
+* kontrollierte Automation
 
----
-
-# Runtime Status
-
-Runtime Core: Stable
-Error Intelligence: Stable
-Observability: Stable
-Decision Engine: Stable
-Auto Scaling: Stable
-
-Current Phase:
-
-Phase 4 – Runtime Intelligence Foundation ✔
-
-Next Phase:
-
-Phase 5 – Runtime Intelligence Expansion
+Jarvis ist kein Chatbot.
+Jarvis ist ein Runtime-System.
 
 ---
 
-# 🔥 Neue Features (aktuell)
+# Current System State
 
-* Signal-basierte Runtime Intelligence
-* Stability Layer (Signal Confirmation)
-* Decision Engine (confidence / priority)
-* Action Mapping mit Cooldown
+Jarvis ist aktuell:
+
+* Signal-driven ✔
+* Decision-based ✔
+* Action-controlled ✔
+* Outcome-aware ✔
+* Learning-enabled (controlled) ✔
+* Observable ✔
+* Deterministic ✔
+
+---
+
+# System Capability
+
+Jarvis kann:
+
+* Runtime Verhalten analysieren
+* Signale erkennen und bestätigen
+* strukturierte Entscheidungen treffen
+* kontrollierte Actions ausführen
+* Ergebnisse bewerten (Outcome System)
+* Verhalten adaptiv verbessern (Learning)
+
+---
+
+# Runtime Model
+
+Jarvis arbeitet als geschlossener Kontrollkreislauf:
+
+Signal
+→ Stability
+→ Decision
+→ Action
+→ Outcome
+→ Learning
+→ Decision Adjustment
+
+---
+
+# Core Features
+
+### Runtime Intelligence
+
+* Signal-basierte Zustandsanalyse
+* Stability Layer (Signal Bestätigung)
 * Signal Decay (Vergessen alter Zustände)
-* Worker Auto Scaling (up / down)
-* Error Backoff Protection
-* Thread-safe Worker Control
+
+---
+
+### Decision Engine
+
+* Confidence / Priority basierte Entscheidungen
+* Score-basierte Trigger Logik
+* Kontrollierte Entscheidungsfilter
+
+---
+
+### Action System
+
+* Scale Up (Queue Pressure)
+* Scale Down (Idle Detection)
+* Worker Restart (Stall Recovery)
+* Cooldown Schutzmechanismen
+
+---
+
+### Outcome System
+
+* Bewertung jeder Action
+* Success / Failure Tracking
+* Execution Time
+* Queue Impact
+* Stability Impact
+
+---
+
+### Learning System
+
+* Kontextbasierte Bewertung (z.B. queue_low / medium / high)
+* GOOD / BAD / NEUTRAL Tracking
+* Einfluss auf:
+
+  * Confidence (leicht)
+  * Priority (begrenzt)
+
+⚠️ Wichtig:
+
+Learning beeinflusst Entscheidungen,
+übernimmt sie aber niemals.
 
 ---
 
@@ -44,72 +112,14 @@ Phase 5 – Runtime Intelligence Expansion
 
 ![Jarvis Dashboard](docs/dashboard.png)
 
-The dashboard provides real-time insight into:
+Zeigt:
 
-- Runtime state
-- Worker activity
-- Signal history
-- System health
-
----
-
-# Runtime Verhalten
-
-Jarvis arbeitet nach folgendem Prinzip:
-
-Signal
-→ Stability (Bestätigung)
-→ Decision (Bewertung)
-→ Action (Ausführung)
-
----
-
-# Release Status
-
-Release: 0.3 – Stable Runtime Engine
-
-Aktueller Stand:
-
-* Stable Runtime Loop ✔
-* Scale Up (Queue Pressure) ✔
-* Scale Down (Idle Detection) ✔
-* Signal Stability ✔
-* Signal Decay ✔
-* Decision Filtering ✔
-* Cooldown System ✔
-* Error Backoff ✔
-
----
-
-# Projektziel
-
-Jarvis Core ist eine stabile Runtime Infrastruktur für AI Systeme.
-
-Fokus:
-
-* Deterministische Execution
-* Runtime Observability
-* Health Intelligence
-* Execution Control
-* System Stability
-
-Nicht Fokus:
-
-* Autonomous Agents
-* Self modifying AI
-* Unkontrolliertes Verhalten
-
----
-
-# Architektur Überblick
-
-Jarvis folgt einer klaren Schichtenarchitektur:
-
-API Layer
-Service Layer
-Runtime Layer
-Worker Loop
-Inference Engine
+* Runtime Status
+* Worker Verhalten
+* Signal History
+* Decision Ergebnisse
+* Performance
+* Learning State
 
 ---
 
@@ -119,25 +129,15 @@ Request
 → Queue
 → Worker
 → Runtime Update
-→ Decision Engine
-→ Action System
-→ Metrics
-→ Dashboard
-
----
-
-# Runtime Feedback Flow
-
-Worker
-→ Runtime Intelligence
 → Signal Generation
 → Decision Engine
-→ Action Execution
-→ System Anpassung
+→ Action System
+→ Outcome Evaluation
+→ Learning Update
 
 ---
 
-# Design Prinzipien
+# Architektur Prinzipien
 
 * Stabilität vor Geschwindigkeit
 * Observability vor Magie
@@ -148,13 +148,40 @@ Worker
 
 ---
 
-# Entwicklungsstatus
+# System Design
 
-Phase 1 – Runtime Core ✔
-Phase 2 – Observability ✔
-Phase 3 – Error Intelligence ✔
-Phase 4 – Runtime Intelligence Foundation ✔
-Phase 5 – Runtime Intelligence Expansion (next)
+Jarvis ist gebaut wie:
+
+* Runtime Kernel
+* Scheduler
+* Kontrollsystem
+
+Nicht wie:
+
+* Chatbot
+* AI Agent
+* Experiment
+
+---
+
+# Safety Model
+
+Jarvis bleibt kontrolliert:
+
+* Keine Action ohne validiertes Signal
+* Keine Action ohne Stabilität
+* Keine Action ohne Thresholds
+* Keine Action ohne Cooldown
+
+Learning darf:
+
+* analysieren
+* unterstützen
+
+Learning darf NICHT:
+
+* direkt entscheiden
+* Runtime überschreiben
 
 ---
 
@@ -164,7 +191,7 @@ Phase 5 – Runtime Intelligence Expansion (next)
 docker compose up -d
 ```
 
-Status prüfen:
+Status:
 
 ```bash
 curl localhost:8002/status
@@ -176,28 +203,29 @@ http://localhost:8002/dashboard/status.html
 
 ---
 
-# Philosophie
+# Status
 
-Jarvis ist gebaut wie:
-
-* ein Runtime Kernel
-* ein Scheduler
-* ein Observability System
-
-Nicht wie:
-
-* ein Chatbot
-* ein Experiment
-* ein Spielzeug
+Jarvis Core ist ein stabiler, lernfähiger Runtime-Control-Systemkern
+mit deterministischem Verhalten und kontrollierter Adaptivität.
 
 ---
 
-# Status
+# Next Evolution
 
-Jarvis Core ist aktuell eine stabile, signalbasierte Runtime Engine
-mit funktionierender Entscheidungslogik und automatischer Skalierung.
+* Feinjustierung der Decision Bias
+* Erweiterte Kontextbewertung
+* Risiko-basierte Entscheidungslogik
+* Erweiterte Observability
 
-Nächster Schritt:
+---
 
-Phase 5 – Lernen und adaptive Entscheidungen
+# Philosophie
+
+Jarvis ist:
+
+Kontrolle vor Autonomie
+Struktur vor Chaos
+Engineering vor Experiment
+
+Runtime bleibt immer in Kontrolle.
 
