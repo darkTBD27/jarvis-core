@@ -1,32 +1,43 @@
 # JARVIS CORE VISION
 
-Jarvis Core ist ein Architekturprojekt mit dem Ziel,
-eine stabile, deterministische und kontrollierte AI Runtime Infrastruktur zu bauen.
+Jarvis Core ist ein Architekturprojekt für eine stabile, deterministische und kontrollierte Runtime-Intelligenz-Infrastruktur.
 
-Der Fokus liegt nicht auf Features, sondern auf Systemqualität,
-Vorhersagbarkeit und langfristiger Stabilität.
+Der Fokus liegt nicht auf maximaler Funktionalität, sondern auf:
+
+* Vorhersagbarkeit
+* Stabilität
+* Kontrollierbarkeit
+* Observability
+* struktureller Integrität
+
+Jarvis wird nicht als Assistent gebaut.  
+Jarvis wird als Runtime-Infrastruktur gebaut.
 
 ---
 
-# SYSTEM REALITY (UPDATED)
+# SYSTEM REALITY
 
-Jarvis ist nicht mehr:
+Jarvis ist kein Monitoring-System.  
+Jarvis ist kein Chatbot.  
+Jarvis ist kein autonomer Agent.
 
-Ein reines Monitoring-System.
+Jarvis ist:
 
-Jarvis ist jetzt:
-
-Eine deterministische Runtime Intelligence Engine
-mit kontrollierter Adaptivität.
+eine deterministische Runtime Intelligence Engine  
+mit kontrollierter Adaptivität  
+und klar erzwungener Zustandsverantwortung.
 
 Das System kann:
 
-* Runtime Verhalten beobachten
+* Runtime-Verhalten beobachten
 * Signale erkennen und bestätigen
-* Strukturierte Entscheidungen treffen
-* Kontrollierte Actions ausführen
-* Ergebnisse bewerten (Outcome System)
-* Verhalten adaptiv verbessern (Learning)
+* Zustände bewerten
+* strukturierte Entscheidungen treffen
+* kontrollierte Actions ausführen
+* Ergebnisse bewerten
+* Verhalten begrenzt adaptiv verbessern
+
+Jarvis bleibt dabei kontrolliert, nachvollziehbar und deterministisch.
 
 ---
 
@@ -34,55 +45,84 @@ Das System kann:
 
 Jarvis soll werden:
 
-Eine stabile AI Runtime Engine
-Eine kontrollierte Execution Plattform
-Eine observability-first Infrastruktur
-Ein deterministischer AI Execution Core
-Ein kontrolliert adaptives Runtime-System
+* eine stabile Runtime Intelligence Engine
+* ein deterministischer Execution Core
+* eine kontrollierte AI-Ausführungsplattform
+* eine observability-first Infrastruktur
+* ein Runtime-Kontrollsystem für adaptive Systeme
 
 Jarvis soll nicht werden:
 
-Ein autonomer Agent
-Ein selbstmodifizierendes System
-Ein unkontrollierbares AI System
-Ein Blackbox-System
+* ein autonomer Agent
+* ein selbstmodifizierendes System
+* ein unkontrollierbares KI-System
+* eine Blackbox
+* ein unvorhersagbares Experiment
 
 ---
 
 # TECHNISCHE ZIELE
 
-Jarvis soll erreichen:
+Jarvis soll langfristig bereitstellen:
 
-Runtime Stability Intelligence
-Error Pattern Detection
-Adaptive Health Monitoring
-Execution Safety Rules
-Runtime Protection Mechanisms
-Controlled Adaptive Decision Making
+* Runtime Stability Intelligence
+* deterministische Runtime-Klassifikation
+* Error Pattern Detection
+* Adaptive Health Monitoring
+* Execution Safety Rules
+* Runtime Protection Mechanisms
+* Controlled Adaptive Decision Making
+* Runtime Consistency Enforcement
 
-Langfristig:
+Langfristiges Ziel:
 
-AI Runtime Kernel Architektur.
+ein deterministischer Runtime-Kernel für kontrollierte AI-Ausführung.
 
 ---
 
-# LEARNING POSITION (NEU)
+# RUNTIME BACKBONE
 
-Learning ist Bestandteil des Systems – aber kontrolliert.
+Jarvis basiert auf einem gehärteten Runtime-Backbone.
+
+Kernprinzipien:
+
+* Single Source of Truth
+* klare State Ownership
+* Write Ownership Enforcement
+* Runtime State ist die einzige Wahrheit
+* Guarded State Mutation
+* deterministische State Transitions
+* kontrollierte Snapshot-Zyklen
+* Consistency Validation als Gate
+
+Ziel:
+
+kein stiller Zustandsdrift  
+keine versteckte Mutation  
+keine unkontrollierte Runtime-Logik
+
+---
+
+# LEARNING POSITION
+
+Learning ist Bestandteil des Systems – aber strikt kontrolliert.
 
 Learning darf:
 
-* Vergangene Outcomes analysieren
+* vergangene Outcomes analysieren
 * Muster erkennen
-* Entscheidungen leicht beeinflussen
+* Gewichtungen leicht beeinflussen
+* Entscheidungen unterstützen
 
 Learning darf NICHT:
 
 * Entscheidungen ersetzen
-* Runtime Verhalten direkt steuern
-* Actions auslösen
+* Runtime direkt steuern
+* Actions selbst auslösen
+* Guards umgehen
+* Runtime überschreiben
 
-Learning ist unterstützend, nicht steuernd.
+Learning ist unterstützend, niemals führend.
 
 ---
 
@@ -90,16 +130,19 @@ Learning ist unterstützend, nicht steuernd.
 
 Jarvis wird gebaut nach:
 
-Stabilität vor Geschwindigkeit
-Verständnis vor Komplexität
-Architektur vor Features
-Kontrolle vor Autonomie
+* Stabilität vor Geschwindigkeit
+* Struktur vor Komplexität
+* Root Cause vor Symptomen
+* Observability vor Magie
+* Architektur vor Features
+* Kontrolle vor Autonomie
 
 Jede Erweiterung muss:
 
-Deterministisch
-Beobachtbar
-Kontrollierbar
+* deterministisch
+* beobachtbar
+* kontrollierbar
+* validierbar
 
 bleiben.
 
@@ -118,6 +161,14 @@ Jarvis besitzt aktuell:
 * Action System ✔
 * Outcome System ✔
 * Learning System (controlled) ✔
+* Runtime Backbone ✔
+* State Ownership Guards ✔
+* Runtime Validation ✔
+* Cycle / Snapshot Protection ✔
+* Live Runtime Verification ✔
+
+Jarvis ist funktional nicht nur adaptiv,  
+sondern strukturell abgesichert.
 
 ---
 
@@ -125,15 +176,20 @@ Jarvis besitzt aktuell:
 
 Jarvis existiert um zu zeigen:
 
-AI kann kontrolliert gebaut werden.
-AI kann deterministisch gebaut werden.
-AI kann wie Infrastruktur gebaut werden.
+AI kann kontrolliert gebaut werden.  
+AI kann deterministisch gebaut werden.  
+AI kann wie Infrastruktur gebaut werden.  
+AI muss nicht Blackbox sein.
 
 Nicht:
 
-Als Experiment
-Nicht als Blackbox
-Nicht als unkontrolliertes System
+als Experiment  
+nicht als autonome Blackbox  
+nicht als unkontrollierbares System
+
+Sondern:
+
+als kontrollierbare Runtime-Infrastruktur.
 
 ---
 
@@ -141,16 +197,19 @@ Nicht als unkontrolliertes System
 
 Jarvis wird iterativ weiterentwickelt.
 
-Jede Erweiterung verbessert:
+Jede Erweiterung muss verbessern:
 
-Stabilität
-Observability
-Intelligence
-Safety
+* Stabilität
+* Observability
+* Determinismus
+* Safety
+* Kontrollierbarkeit
 
 Nicht:
 
-Komplexität ohne Kontrolle.
+* Komplexität ohne Kontrolle
+* Intelligenz ohne Begrenzung
+* Adaptivität ohne Guardrails
 
 ---
 
@@ -158,18 +217,26 @@ Komplexität ohne Kontrolle.
 
 Nicht:
 
-Mehr Intelligenz hinzufügen.
+mehr Intelligenz hinzufügen.
 
 Sondern:
 
-Intelligenz kontrollieren.
+Intelligenz strukturell härten.
 
 Fokus:
 
-* Feinjustierung der Entscheidungslogik
-* Begrenzte adaptive Anpassung
-* Erweiterte Kontextbewertung
-* Risiko-basierte Entscheidungen
+* strukturelle Entkopplung des Runtime-Core
+* klare Modulgrenzen
+* kleinere Verantwortungsbereiche
+* stärkere Test-Isolation
+* identisches Verhalten bei besserer Struktur
+
+Nächster Schritt:
+
+* `runtime_state.py`
+* `runtime_access.py`
+* `runtime_snapshot.py`
+* `runtime_validation.py`
 
 ---
 
@@ -177,16 +244,18 @@ Fokus:
 
 Jarvis soll langfristig:
 
-Runtime Verhalten verstehen
-Risiken früh erkennen
-Stabilitätsentscheidungen treffen
-Systemverhalten optimieren
+* Runtime-Verhalten verstehen
+* Risiken früh erkennen
+* Stabilitätsentscheidungen treffen
+* Systemverhalten absichern
+* adaptive Systeme kontrolliert steuern
 
 Aber immer:
 
-Kontrolliert
-Deterministisch
-Vorhersagbar
+* kontrolliert
+* deterministisch
+* vorhersagbar
+* validierbar
 
 ---
 
@@ -196,11 +265,10 @@ Jarvis wird gebaut wie Infrastruktur.
 
 Infrastruktur muss:
 
-Langweilig stabil sein
-Vorhersagbar sein
-Erklärbar sein
+* langweilig stabil sein
+* vorhersagbar sein
+* erklärbar sein
+* überprüfbar sein
 
-Adaptivität ist erlaubt.
-
+Adaptivität ist erlaubt.  
 Kontrollverlust nicht.
-

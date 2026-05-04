@@ -2,21 +2,25 @@
 
 Deterministic Runtime Intelligence Infrastructure
 
-Jarvis Core ist eine lokale Runtime Engine für AI Execution mit Fokus auf:
+Jarvis Core ist eine lokale Runtime Engine für deterministische AI-Ausführung.
+
+Fokus:
 
 * Stabilität
 * Observability
 * deterministische Entscheidungen
 * kontrollierte Automation
+* klare Zustandsverantwortung
 
 Jarvis ist kein Chatbot.
+Jarvis ist kein Agent.
 Jarvis ist ein Runtime-System.
 
 ---
 
-# Current System State
+# Current Status
 
-Jarvis ist aktuell:
+Jarvis ist aktuell produktiv:
 
 * Signal-driven ✔
 * Decision-based ✔
@@ -25,86 +29,140 @@ Jarvis ist aktuell:
 * Learning-enabled (controlled) ✔
 * Observable ✔
 * Deterministic ✔
+* Backbone-hardened ✔
+* Runtime live-verified ✔
 
 ---
 
-# System Capability
+# What Jarvis Does
 
-Jarvis kann:
+Jarvis verarbeitet Runtime-Zustände als kontrollierten Ausführungszyklus:
 
-* Runtime Verhalten analysieren
+* Runtime-Verhalten beobachten
 * Signale erkennen und bestätigen
+* Zustände bewerten
 * strukturierte Entscheidungen treffen
 * kontrollierte Actions ausführen
-* Ergebnisse bewerten (Outcome System)
-* Verhalten adaptiv verbessern (Learning)
+* Ergebnisse bewerten
+* Verhalten begrenzt adaptiv verbessern
+
+Jarvis bleibt dabei deterministisch, beobachtbar und kontrollierbar.
 
 ---
 
-# Runtime Model
+# Runtime Backbone
 
-Jarvis arbeitet als geschlossener Kontrollkreislauf:
+Jarvis läuft auf einem gehärteten Runtime-Backbone.
 
-Signal
-→ Stability
-→ Decision
-→ Action
-→ Outcome
-→ Learning
-→ Decision Adjustment
+Produktiv abgesichert:
+
+* Single Source of Truth Runtime
+* harte State Ownership
+* Write Ownership nur über `RUNTIME_ACCESS`
+* deterministische Write-Validierung
+* kontrollierte State Transitions
+* Cycle / Snapshot Guards
+* Snapshot Commit Protection
+* Runtime Consistency Validation
+* Runtime-Hotpath Guarding
+
+Das Runtime-System akzeptiert keine stillen Mutationen außerhalb des kontrollierten Zugriffspfads.
 
 ---
 
-# Core Features
+# Runtime Flow
+
+Jarvis arbeitet als kontrollierter Laufzeitkreislauf:
+
+Request
+→ Queue
+→ Worker
+→ Runtime Update
+→ Signal Generation
+→ Decision Engine
+→ Action System
+→ Outcome Evaluation
+→ Learning Update
+
+---
+
+# Core Modules
 
 ### Runtime Intelligence
 
 * Signal-basierte Zustandsanalyse
-* Stability Layer (Signal Bestätigung)
-* Signal Decay (Vergessen alter Zustände)
-
----
+* Stability Layer
+* Signal Decay
+* deterministische Runtime-Klassifikation
 
 ### Decision Engine
 
-* Confidence / Priority basierte Entscheidungen
-* Score-basierte Trigger Logik
-* Kontrollierte Entscheidungsfilter
-
----
+* Confidence / Priority-basierte Entscheidungen
+* Score-basierte Trigger-Logik
+* kontrollierte Entscheidungsfilter
+* deterministische Bewertungslogik
 
 ### Action System
 
-* Scale Up (Queue Pressure)
-* Scale Down (Idle Detection)
-* Worker Restart (Stall Recovery)
-* Cooldown Schutzmechanismen
-
----
+* Scale Up
+* Scale Down
+* Worker Restart
+* Cooldown-Schutzmechanismen
+* kontrollierte Action-Gates
 
 ### Outcome System
 
-* Bewertung jeder Action
+* Action-Bewertung
 * Success / Failure Tracking
-* Execution Time
 * Queue Impact
 * Stability Impact
-
----
+* Outcome-Rückkopplung
 
 ### Learning System
 
-* Kontextbasierte Bewertung (z.B. queue_low / medium / high)
+* kontrollierte adaptive Gewichtung
 * GOOD / BAD / NEUTRAL Tracking
-* Einfluss auf:
+* kontextbasierte Bewertung
 
-  * Confidence (leicht)
-  * Priority (begrenzt)
+Learning unterstützt Entscheidungen.
+Learning ersetzt Entscheidungen nicht.
 
-⚠️ Wichtig:
+---
 
-Learning beeinflusst Entscheidungen,
-übernimmt sie aber niemals.
+# Runtime Validation
+
+Jarvis validiert aktiv:
+
+* State Transitions
+* Write Ownership
+* Worker Consistency
+* Cycle Integrity
+* Snapshot Reihenfolge
+* Runtime Invariants
+* Guard Violations
+
+Ziel:
+
+deterministisches Laufzeitverhalten ohne stille Inkonsistenzen.
+
+---
+
+# Live Verification
+
+Der Runtime-Core wurde gegen reales Laufzeitverhalten geprüft.
+
+Bestätigt:
+
+* keine stillen Write-Bypässe
+* keine State-Corruption
+* keine Guard-Bypässe
+* keine Snapshot/Cycle-Regression
+* keine stillen Inkonsistenzen
+* keine Runtime-Hotpath-Regression
+
+Status:
+
+**Live Verification PASS** ✔
 
 ---
 
@@ -120,47 +178,7 @@ Zeigt:
 * Decision Ergebnisse
 * Performance
 * Learning State
-
----
-
-# Execution Flow
-
-Request
-→ Queue
-→ Worker
-→ Runtime Update
-→ Signal Generation
-→ Decision Engine
-→ Action System
-→ Outcome Evaluation
-→ Learning Update
-
----
-
-# Architektur Prinzipien
-
-* Stabilität vor Geschwindigkeit
-* Observability vor Magie
-* Determinismus vor Zufall
-* Architektur vor Features
-* Single Source of Truth
-* Klare State Ownership
-
----
-
-# System Design
-
-Jarvis ist gebaut wie:
-
-* Runtime Kernel
-* Scheduler
-* Kontrollsystem
-
-Nicht wie:
-
-* Chatbot
-* AI Agent
-* Experiment
+* Runtime Health
 
 ---
 
@@ -168,64 +186,73 @@ Nicht wie:
 
 Jarvis bleibt kontrolliert:
 
-* Keine Action ohne validiertes Signal
-* Keine Action ohne Stabilität
-* Keine Action ohne Thresholds
-* Keine Action ohne Cooldown
+* keine Action ohne validiertes Signal
+* keine Action ohne Stabilität
+* keine Action ohne Thresholds
+* keine Action ohne Cooldown
+* keine Mutation ohne Write-Gate
+* keine Runtime-Änderung ohne Ownership
 
 Learning darf:
 
 * analysieren
 * unterstützen
+* gewichten
 
 Learning darf NICHT:
 
 * direkt entscheiden
 * Runtime überschreiben
+* Guards umgehen
 
 ---
 
 # Start
 
-```bash
+bash
 docker compose up -d
-```
 
-Status:
 
-```bash
+#Status:
+
 curl localhost:8002/status
-```
 
-Dashboard:
+#Dashboard:
 
 http://localhost:8002/dashboard/status.html
 
 ---
 
-# Status
+## Usage Notice
 
-Jarvis Core ist ein stabiler, lernfähiger Runtime-Control-Systemkern
-mit deterministischem Verhalten und kontrollierter Adaptivität.
+This repository is source-available for educational, research, and architectural reference purposes only.
 
----
-
-# Next Evolution
-
-* Feinjustierung der Decision Bias
-* Erweiterte Kontextbewertung
-* Risiko-basierte Entscheidungslogik
-* Erweiterte Observability
+No open-source license is currently granted.
+See NOTICE.md and LICENSE for usage restrictions and rights.
 
 ---
 
-# Philosophie
+# Next Step
 
-Jarvis ist:
+Nächster technischer Schritt:
 
-Kontrolle vor Autonomie
-Struktur vor Chaos
-Engineering vor Experiment
+struktureller Split des Runtime-Core
 
-Runtime bleibt immer in Kontrolle.
+* runtime_state.py
+* runtime_access.py
+* `runtime_snapshot.py`
+* `runtime_validation.py`
 
+Ziel:
+
+* kleinere Verantwortungsbereiche
+* bessere Wartbarkeit
+* bessere Testbarkeit
+* identisches Laufzeitverhalten bei sauberer Trennung
+
+---
+
+# Status Summary
+
+Jarvis Core ist ein stabiler, deterministischer Runtime-Control-Systemkern
+mit gehärtetem Backbone, kontrollierter Adaptivität und live verifiziertem Runtime-Core.
