@@ -1,18 +1,9 @@
-# ============================================================
-# RUNTIME HEALTH SYSTEM
-# ------------------------------------------------------------
-# Zweck:
-# Bestimmt den aktuellen Gesundheitszustand der Runtime
-#
-# Wichtig:
-# Health ist ein STABILER Zustand, keine Momentaufnahme!
-# ============================================================
 
 from enum import Enum
 
-from inference import metrics
-from inference.queue_system import get_queue
-from inference.runtime_object import get_runtime
+from inference.queue_system import queue_size
+from inference.runtime_object import RUNTIME_ACCESS
+
 from inference.runtime_errors import get_error_history
 
 from config.runtime_config import (
@@ -23,10 +14,6 @@ from config.runtime_config import (
 )
 
 import time
-
-# ============================================================
-# CONFIG
-# ============================================================
 
 MIN_HEALTH_DURATION = 5  # Sekunden (Anti-Flapping)
 
@@ -47,9 +34,11 @@ class HealthState(Enum):
 
 def _calculate_error_rate():
 
-    total = metrics.REQUEST_COUNT
+    runtime = RUNTIME_ACCESS
+    total = runtime.get_metric("requests_total")
 
-    if total == 0:
+    # --- MIN SAMPLE SIZE (ANTI NOISE) ---
+    if total < 10:
         return 0.0
 
     errors = len(get_error_history())
@@ -61,9 +50,11 @@ def _calculate_timeout_rate():
 
     from inference.runtime_errors import get_error_types
 
-    total = metrics.REQUEST_COUNT
+    runtime = RUNTIME_ACCESS
+    total = runtime.get_metric("requests_total")
 
-    if total == 0:
+    # --- MIN SAMPLE SIZE (ANTI NOISE) ---
+    if total < 10:
         return 0.0
 
     timeouts = get_error_types().get("TimeoutError", 0)
@@ -110,7 +101,7 @@ def get_recent_error_categories(seconds=120):
 
 def health_is_flapping(runtime, window=10):
 
-    history = runtime.get_health_history()
+    history = runtime.read("health_history")
 
     if len(history) < window:
         return False
@@ -133,9 +124,9 @@ def health_is_flapping(runtime, window=10):
 
 def evaluate_runtime_health(rt):
 
-    errors = rt.metric_get("requests_error")
-    timeouts = rt.metric_get("requests_timeout")
-    slow = rt.metric_get("slow_requests")
+    errors = rt.get_metric("requests_error")
+    timeouts = rt.get_metric("requests_timeout")
+    slow = rt.get_metric("slow_requests")
 
     if timeouts > 3:
         return "degraded"
@@ -153,90 +144,14 @@ def evaluate_runtime_health(rt):
 # ============================================================
 
 def calculate_health():
-
-    runtime = get_runtime()
-
-    # --- INPUT ---
-    intel_health = evaluate_runtime_health(runtime)
-    error_rate = _calculate_error_rate()
-    timeout_rate = _calculate_timeout_rate()
-
-    queue_size = runtime.queue_size
-    busy = runtime.busy
-
-    critical_recent = has_recent_critical_error()
-
-    from inference.runtime_errors import is_error_spiking
-    spike = is_error_spiking()
-
-    recent_categories = get_recent_error_categories()
-    flapping = health_is_flapping(runtime)
-
-    # ========================================================
-    # DECISION TREE
-    # ========================================================
-
-    if critical_recent:
-        health = HealthState.DEGRADED
-
-    elif error_rate > HEALTH_ERROR_THRESHOLD and spike:
-        health = HealthState.ERROR
-
-    elif timeout_rate > HEALTH_TIMEOUT_THRESHOLD:
-        health = HealthState.DEGRADED
-
-    elif error_rate > HEALTH_DEGRADED_ERROR_THRESHOLD:
-        health = HealthState.DEGRADED
-
-    elif recent_categories.get("CONFIG_ERROR", 0) >= 2:
-        health = HealthState.ERROR
-
-    elif recent_categories.get("DEPENDENCY_ERROR", 0) >= 2:
-        health = HealthState.DEGRADED
-
-    elif spike:
-        health = HealthState.DEGRADED
-
-    elif flapping:
-        health = HealthState.DEGRADED
-
-    elif queue_size > HEALTH_QUEUE_BUSY and not critical_recent:
-        health = HealthState.BUSY
-
-    elif busy and error_rate < HEALTH_DEGRADED_ERROR_THRESHOLD:
-        health = HealthState.BUSY
-
-    elif intel_health == "degraded" and not flapping:
-        health = HealthState.DEGRADED
-
-    else:
-        health = HealthState.HEALTHY
-
-    # ========================================================
-    # STABILIZATION (ANTI-FLAPPING)
-    # ========================================================
-
-    current = runtime.get_health()
-    now = time.time()
-
-    last_change_time = getattr(runtime, "health_last_change", 0)
-
-    if current != health.value:
-
-        if now - last_change_time >= MIN_HEALTH_DURATION:
-
-            runtime.set_health(health.value)
-            runtime.add_health_history(health.value)
-            runtime.health_last_change = now
-
-    return health
+    return None
 
 # ============================================================
 # PUBLIC API
 # ============================================================
 
 def get_runtime_health():
-    return calculate_health().value
+    return None
 
 
 def get_error_intelligence():

@@ -1,36 +1,13 @@
-# ============================================================
-# ACTION MAPPER
-# ------------------------------------------------------------
-# Zweck:
-# Mappt Decision → Action unter Berücksichtigung von:
-# - Signal Stabilität
-# - Confidence / Priority
-# - Cooldowns
-# - Learning Feedback (Phase 5.2)
-# ============================================================
-
-from learning_store import get_action_score
+# VERIFY MAKER: Xp}@&(AW
 
 import time
 import logging
 
-logger = logging.getLogger("jarvis")
-
-# ============================================================
-# STATE (Runtime-intern, kein globaler Runtime-State!)
-# ============================================================
-
-last_action_time = {}
-
-signal_counter = {}
-signal_last_seen = {}
+from engine.logger import logger
 
 # ============================================================
 # CONFIG
 # ============================================================
-
-SIGNAL_THRESHOLD = 2
-SIGNAL_DECAY_TIME = 10  # Sekunden
 
 ACTION_COOLDOWNS = {
     "scale_queue": 10,
@@ -38,92 +15,70 @@ ACTION_COOLDOWNS = {
     "restart_worker": 20
 }
 
+# globale Cooldown Speicherung (Action-basiert, erlaubt)
+last_action_time = {}
+
+# Mindestanforderungen
+MIN_CONFIDENCE = 0.6
+MIN_PRIORITY = 3
+
+
 # ============================================================
-# MAIN MAPPING FUNCTION
+# MAIN
 # ============================================================
 
 def map_decision_to_action(decision):
 
-    signal = decision.trigger_signal
+    if decision.decision_type != "normal":
+        logger.info(f"[ACTION NONE] decision_type={decision.decision_type}")
+        return None
 
+    confidence = getattr(decision, "confidence", 0.0)
+
+    meta = getattr(decision, "meta", {}) or {}
+
+    base_conf = meta.get("base_confidence", confidence)
+    base_priority = meta.get("base_priority", getattr(decision, "priority", 0))
+
+    priority = getattr(decision, "priority", 0)
+
+    signal = decision.trigger_signal or {}
     signal_type = signal.get("type")
-    is_stable = signal.get("stable", False)
-
-    confidence = decision.confidence
-    priority = decision.priority
 
     # ========================================================
-    # SIGNAL STABILITY (COUNT + DECAY)
+    # THRESHOLD CHECK
     # ========================================================
 
-    now = time.time()
-
-    last_seen = signal_last_seen.get(signal_type)
-
-    if last_seen and (now - last_seen > SIGNAL_DECAY_TIME):
-        signal_counter[signal_type] = 0
-
-    count = signal_counter.get(signal_type, 0) + 1
-    signal_counter[signal_type] = count
-    signal_last_seen[signal_type] = now
-
-    logger.info(f"[DEBUG] signal={signal_type} count={count}")
-
-    # ========================================================
-    # BALANCED TRIGGER LOGIC
-    # ========================================================
-
-    # --- Mindest-Stabilität ---
-    if count < 2:
+    if base_conf < MIN_CONFIDENCE:
+        logger.info(
+            f"[ACTION BLOCKED] base confidence too low "
+            f"({round(base_conf,3)})"
+        )
         return None
 
-    # --- Adaptive Confidence ---
-    if is_stable:
-        min_conf = 0.5
-    else:
-        min_conf = 0.65
-
-    if confidence < min_conf:
-        return None
-
-    # --- Adaptive Priority ---
-    if is_stable:
-        min_prio = 2
-    else:
-        min_prio = 4
-
-    if priority < min_prio:
-        return None
-
-    # --- ACTION COOLDOWN ---
-    last_exec = last_action_time.get(signal_type)
-
-    if last_exec and (time.time() - last_exec < 3):
-        return None
-
-    last_action_time[signal_type] = time.time()
-
     # ========================================================
-    # SIGNAL → ACTION MAPPING
+    # ACTION SELECTION (deterministisch)
     # ========================================================
 
     action = None
 
-    if signal_type == "QUEUE_PRESSURE" and is_stable:
+    # --- SCALE UP ---
+    if signal_type == "QUEUE_PRESSURE":
         action = "scale_queue"
 
-    elif signal_type == "RUNTIME_IDLE" and is_stable:
-        if decision.runtime_state_snapshot.get("uptime", 0) > 30:
-            action = "scale_down"
+    # --- SCALE DOWN ---
+    elif signal_type == "LATENCY":
+        if base_priority >= 5:
+            action = "scale_queue"
 
-    elif signal_type == "WORKER_STALLED":
-        action = "restart_worker"
+    # --- RESTART ---
+    elif signal_type == "ERROR_RATE":
+        if base_conf > 0.8:
+            action = "restart_worker"
 
     if not action:
+        logger.info(f"[ACTION NONE] no mapping for signal={signal_type}")
         return None
-
-    logger.info(f"[ACTION_CHECK] signal={signal_type} stable={is_stable} conf={confidence} prio={priority}")
-    logger.info(f"[ACTION_RESULT] action={action}")
 
     # ========================================================
     # COOLDOWN CHECK
@@ -134,12 +89,21 @@ def map_decision_to_action(decision):
     cooldown = ACTION_COOLDOWNS.get(action, 5)
 
     if now - last_time < cooldown:
+        logger.info(f"[ACTION BLOCKED] cooldown active ({action})")
         return None
 
     last_action_time[action] = now
 
     # ========================================================
-    # FINAL ACTION
+    # FINAL
     # ========================================================
+
+    logger.info(
+        f"[ACTION] {action} | "
+        f"conf={round(base_conf,3)} "
+        f"prio={priority} "
+        f"base_prio={base_priority} "
+        f"signal={signal_type}"
+    )
 
     return action

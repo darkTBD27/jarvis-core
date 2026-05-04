@@ -1,155 +1,194 @@
-# ============================================================
-# STATUS SERVICE
-# ------------------------------------------------------------
-# Zweck:
-# Liefert aktuellen Runtime-Zustand für Dashboard
-#
-# Enthält:
-# - Runtime State
-# - Worker Status
-# - Performance
-# - Errors
-# - Signals
-# - Learning (Action Verhalten)
-# ============================================================
+# VERIFY MARKER: !3T§!$(a
 
-from inference.runtime_health import get_runtime_health
-from inference.runtime_health import get_error_intelligence
+from inference.runtime_state import get_request_event_flow
+from inference.runtime_state import get_runtime_snapshot
 
-from inference.runtime_object import get_runtime
+EXPECTED_RUNTIME_FLOW = [
+    "runtime_run_requested",
+    "queue_enqueue",
+    "queue_dequeue",
+    "request_started",
+    "execution_started",
+    "execution_finished",
+    "decision_made",
+    "action_executed",
+    "runtime_idle"
+]
 
-from inference.runtime_intelligence import get_runtime_intelligence
-
-from learning_store import get_learning_state
-
-
-# ============================================================
-# MAIN ENTRY
-# ============================================================
 
 def get_status():
+    return get_runtime_snapshot()
 
-    rt = get_runtime()
 
-    intelligence = get_runtime_intelligence()
-    learning = get_learning_state()
-
-    # ========================================================
-    # CORE STATE
-    # ========================================================
-
-    core = {
-        "state": rt.state,
-        "uptime": rt.get_uptime(),
-        "busy": rt.busy,
-        "health": get_runtime_health()
+def get_request_flow(request_id):
+    return {
+        "request_id": request_id,
+        "events": get_request_event_flow(request_id)
     }
 
-    # ========================================================
-    # WORKER
-    # ========================================================
 
-    worker = {
-        "status": rt.get_worker_status(),
-        "heartbeat_age": rt.get_worker_heartbeat_age(),
-        "last_activity": rt.get_worker_last_activity_age()
-    }
+def compare_request_flow(request_id):
+    flow = get_request_event_flow(request_id)
 
-    # ========================================================
-    # QUEUE
-    # ========================================================
+    observed = [event.get("type") for event in flow]
 
-    queue = {
-        "size": rt.queue_size,
-        "limit": 0
-    }
+    missing = [step for step in EXPECTED_RUNTIME_FLOW if step not in observed]
+    unexpected = [step for step in observed if step not in EXPECTED_RUNTIME_FLOW]
 
-    # ========================================================
-    # PERFORMANCE
-    # ========================================================
-
-    performance = {
-        "tokens_per_sec": rt.metric_get("tokens_per_sec"),
-        "last_duration": rt.metric_get("last_duration"),
-        "avg_duration": rt.metric_get("avg_duration"),
-        "total_requests": rt.metric_get("requests_total"),
-        "success_requests": rt.metric_get("requests_success"),
-        "slow_requests": rt.metric_get("slow_requests")
-    }
-
-    # ========================================================
-    # ERRORS
-    # ========================================================
-
-    errors = {
-        "last_error": rt.get_last_error(),
-        "error_types": rt.get_error_types(),
-        "error_history": rt.get_error_history(),
-        "timeouts": rt.metric_get("requests_timeout")
-    }
-
-    # ========================================================
-    # ACTIVITY
-    # ========================================================
-
-    activity = {
-        "current_request": rt.current_request,
-        "last_request": rt.last_request,
-        "history": rt.history,
-        "runtime_events": rt.get_runtime_events()[-10:]
-    }
-
-    # ========================================================
-    # SIGNALS
-    # ========================================================
-
-    signals = {
-        "signal_history": rt.signal_history
-    }
-
-    # ========================================================
-    # FINAL RESPONSE
-    # ========================================================
+    ordered = observed == sorted(
+        observed,
+        key=lambda step: EXPECTED_RUNTIME_FLOW.index(step)
+        if step in EXPECTED_RUNTIME_FLOW else 999
+    )
 
     return {
-
-        "jarvis": {
-            "state": core["state"],
-            "uptime": core["uptime"]
-        },
-
-        "busy": core["busy"],
-        "health": core["health"],
-
-        "queue": queue["size"],
-        "queue_limit": queue["limit"],
-
-        "worker_status": worker["status"],
-        "worker_heartbeat_age": worker["heartbeat_age"],
-        "worker_last_activity": worker["last_activity"],
-
-        "current_request": activity["current_request"],
-        "last_request": activity["last_request"],
-
-        "history": activity["history"],
-        "runtime_events": activity["runtime_events"],
-
-        "tokens_per_sec": performance["tokens_per_sec"],
-        "last_duration": performance["last_duration"],
-        "avg_duration": performance["avg_duration"],
-        "total_requests": performance["total_requests"],
-        "success_requests": performance["success_requests"],
-        "slow_requests": performance["slow_requests"],
-
-        "last_error": errors["last_error"],
-        "error_types": errors["error_types"],
-        "error_history": errors["error_history"],
-        "timeouts": errors["timeouts"],
-
-        "error_intelligence": intelligence,
-
-        "signal_history": signals["signal_history"],
-
-        # LEARNING
-        "learning": learning
+        "request_id": request_id,
+        "expected": EXPECTED_RUNTIME_FLOW,
+        "observed": observed,
+        "missing": missing,
+        "unexpected": unexpected,
+        "ordered": ordered,
+        "valid": len(missing) == 0 and len(unexpected) == 0 and ordered
     }
+
+
+def classify_architecture_relevance(request_id):
+    result = compare_request_flow(request_id)
+
+    if result["valid"]:
+        classification = "irrelevant"
+        backbone_rule = "none"
+
+    elif result["missing"] and not result["unexpected"]:
+        classification = "structural_risk"
+        backbone_rule = "runtime_flow"
+
+    elif result["unexpected"] and not result["missing"]:
+        classification = "observability_gap"
+        backbone_rule = "observability_integrity"
+
+    elif not result["ordered"]:
+        classification = "backbone_violation"
+        backbone_rule = "execution_isolation"
+
+    else:
+        classification = "tolerable_deviation"
+        backbone_rule = "runtime_flow"
+
+    return {
+        "request_id": request_id,
+        "valid": result["valid"],
+        "classification": classification,
+        "backbone_rule": backbone_rule,
+        "details": {
+            "missing": result["missing"],
+            "unexpected": result["unexpected"],
+            "ordered": result["ordered"]
+        }
+    }
+
+
+def filter_operational_relevance(request_id):
+    result = classify_architecture_relevance(request_id)
+
+    if result["classification"] == "irrelevant":
+        action = "ignore"
+
+    elif result["classification"] == "tolerable_deviation":
+        action = "observe"
+
+    elif result["classification"] == "observability_gap":
+        action = "revalidate"
+
+    elif result["classification"] in ("structural_risk", "backbone_violation"):
+        action = "operate"
+
+    else:
+        action = "observe"
+
+    return {
+        "request_id": request_id,
+        "valid": result["valid"],
+        "classification": result["classification"],
+        "backbone_rule": result["backbone_rule"],
+        "action": action,
+        "details": result["details"]
+    }
+
+
+def prioritize_risk(request_id):
+    result = filter_operational_relevance(request_id)
+
+    if result["action"] == "operate":
+        priority = "high"
+
+    elif result["action"] == "revalidate":
+        priority = "medium"
+
+    elif result["action"] == "observe":
+        priority = "low"
+
+    else:
+        priority = "none"
+
+    return {
+        "request_id": request_id,
+        "valid": result["valid"],
+        "classification": result["classification"],
+        "backbone_rule": result["backbone_rule"],
+        "action": result["action"],
+        "priority": priority,
+        "details": result["details"]
+    }
+
+
+def isolate_next_task(request_id):
+    result = prioritize_risk(request_id)
+
+    if result["priority"] == "high":
+        next_task = "new_current_task"
+
+    elif result["priority"] == "medium":
+        next_task = "revalidate_later"
+
+    elif result["priority"] == "low":
+        next_task = "observe_only"
+
+    else:
+        next_task = "none"
+
+    return {
+        "request_id": request_id,
+        "valid": result["valid"],
+        "classification": result["classification"],
+        "backbone_rule": result["backbone_rule"],
+        "action": result["action"],
+        "priority": result["priority"],
+        "next_task": next_task,
+        "details": result["details"]
+    }
+
+
+def validate_backbone_gate(request_id):
+    result = isolate_next_task(request_id)
+
+    gate_passed = (
+        result["valid"] or
+        result["next_task"] in ("new_current_task", "revalidate_later", "observe_only", "none")
+    )
+
+    return {
+        "request_id": request_id,
+        "valid": result["valid"],
+        "classification": result["classification"],
+        "backbone_rule": result["backbone_rule"],
+        "action": result["action"],
+        "priority": result["priority"],
+        "next_task": result["next_task"],
+        "gate_passed": gate_passed,
+        "details": result["details"]
+    }
+
+
+def build_validation_pipeline(request_id):
+    return validate_backbone_gate(request_id)

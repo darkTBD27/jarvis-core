@@ -30,20 +30,25 @@ MAX_SCORE = 1.0        # clamp
 # Wandelt Outcome → Kontext-Key
 # ============================================================
 
-def build_context_key(outcome):
+def build_context_key(outcome=None, runtime=None):
 
-    queue = outcome.context.get("queue_before", 0)
+    if outcome is not None:
+        queue = getattr(outcome, "queue_before", 0)
+    elif runtime is not None:
+        queue = getattr(runtime, "queue_size", 0)
+    else:
+        return "QUEUE_UNKNOWN"
 
     if queue == 0:
-        return "queue_0"
+        return "QUEUE_0"
 
     if queue < 3:
-        return "queue_low"
+        return "QUEUE_LOW"
 
     if queue < 6:
-        return "queue_medium"
+        return "QUEUE_MEDIUM"
 
-    return "queue_high"
+    return "QUEUE_HIGH"
 
 
 # ============================================================
@@ -53,6 +58,8 @@ def build_context_key(outcome):
 # ============================================================
 
 def update_learning(action, result, outcome):
+
+    action = str(action).upper()
 
     key = build_context_key(outcome)
 
@@ -73,14 +80,13 @@ def update_learning(action, result, outcome):
     for k in learning[action][key]:
         learning[action][key][k] *= DECAY_FACTOR
 
-    # -------------------------------------------------
-    # UPDATE
-    # -------------------------------------------------
-
-    if result not in learning[action][key]:
-        learning[action][key][result] = 0.0
-
-    learning[action][key][result] += 1.0
+    # --- SAFE UPDATE ---
+    if result == "GOOD":
+        learning[action][key]["GOOD"] += 1.0
+    elif result == "BAD":
+        learning[action][key]["BAD"] += 1.0
+    else:
+        learning[action][key]["NEUTRAL"] += 1.0
 
 
 # ============================================================
@@ -91,20 +97,13 @@ def update_learning(action, result, outcome):
 
 def get_action_score(action, context=None, runtime=None):
 
+    action = str(action).upper()
+
     # --- Fallbacks für alte Aufrufe ---
     if runtime is None:
         return 0.0
 
-    queue = runtime.queue_size
-
-    if queue == 0:
-        key = "queue_0"
-    elif queue < 3:
-        key = "queue_low"
-    elif queue < 6:
-        key = "queue_medium"
-    else:
-        key = "queue_high"
+    key = build_context_key(runtime=runtime)
 
     stats = learning.get(action, {}).get(key, {})
 
@@ -115,8 +114,6 @@ def get_action_score(action, context=None, runtime=None):
 
     if total == 0:
         return 0.0
-
-    return (good - bad) / total
 
     # -------------------------------------------------
     # MIN SAMPLES PROTECTION
@@ -146,6 +143,7 @@ def get_action_score(action, context=None, runtime=None):
 # ============================================================
 
 def get_action_stats(action):
+    action = str(action).upper()
     return learning.get(action, {})
 
 

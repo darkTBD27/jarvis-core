@@ -1,10 +1,11 @@
-from inference.runtime_object import get_runtime
+#VERIFY MARKER: B79J)+.,
+
+from inference.runtime_object import RUNTIME_ACCESS
 
 
 def get_latest_signals(limit=5):
-    runtime = get_runtime()
 
-    history = getattr(runtime, "signal_history", [])
+    history = RUNTIME_ACCESS.read("signals")
 
     if not history:
         return []

@@ -1,24 +1,23 @@
-from inference.runtime_object import get_runtime
-
+from inference.runtime_object import RUNTIME_ACCESS
 
 def check_runtime_triggers():
 
-    runtime = get_runtime()
+    runtime = RUNTIME_ACCESS
 
     triggers = []
 
 
-    if runtime.health == "error":
+    if runtime.read("health") == "error":
 
         triggers.append("runtime_error")
 
 
-    if runtime.queue_size > 10:
+    if runtime.read("queue_size") > 10:
 
         triggers.append("queue_pressure")
 
 
-    if runtime.busy:
+    if runtime.read("busy"):
 
         triggers.append("runtime_busy")
 
@@ -27,15 +26,6 @@ def check_runtime_triggers():
 
 
 def run_automation(triggers):
-
-    runtime = get_runtime()
-
-    for trigger in triggers:
-
-        if trigger == "runtime_error":
-
-            runtime.metric_inc("automation_error_detected")
-
-        if trigger == "queue_pressure":
-
-            runtime.metric_inc("automation_queue_pressure")
+    # Phase 4:
+    # Automation ist deaktiviert (keine Actions, keine Writes)
+    return None

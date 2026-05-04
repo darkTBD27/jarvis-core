@@ -1,22 +1,20 @@
 from models.model_loader import get_model
 from engine.logger import log_inference_error
 
-from inference.metrics import *
+from inference.runtime_object import RUNTIME_ACCESS
+
 from inference.events import *
 from inference.tools.tool_registry import *
 from inference.queue_system import *
 from inference.runtime_state import (
     set_model_warm,
     set_request_status,
-    add_request_history,
-    add_runtime_event
+    add_request_history
 )
 
 from inference.runtime_errors import add_error
 from inference.runtime_errors import inc_error_retry
 from inference.runtime_errors import get_error_retry_count
-
-from inference.runtime_object import get_runtime
 
 from config.runtime_config import DEFAULT_SYSTEM_PROMPT
 from config.runtime_config import (
@@ -311,16 +309,14 @@ def finalize_request(
     global LAST_CRASH_TIME
     global LAST_CRASH_REQUEST
 
-    runtime = get_runtime()
-
     set_request_status(request_id,status)
 
 
     if status == STATUS_FINISHED:
 
-        runtime.metric_inc("requests_success")
+        RUNTIME_ACCESS.metric_inc("requests_success")
 
-        runtime.add_history({
+        RUNTIME_ACCESS.add_history({
 
             "request_id":request_id,
 
@@ -339,7 +335,7 @@ def finalize_request(
         LAST_SUCCESS_REQUEST = request_id
         LAST_SUCCESS_TIME = time.time()
 
-        add_runtime_event(
+        RUNTIME_ACCESS.emit_event(
             "request_finished",
             {
                 "request_id":request_id,
@@ -348,7 +344,7 @@ def finalize_request(
             }
         )
 
-        runtime.metric_set("last_success_request",request_id)
+        RUNTIME_ACCESS.metric_set("last_success_request",request_id)
 
 
     elif status == STATUS_TIMEOUT:
@@ -358,8 +354,8 @@ def finalize_request(
 
         track_error(request_id,ERROR_TIMEOUT)
 
-        runtime.metric_inc("requests_error")
-        runtime.metric_inc("requests_timeout")
+        RUNTIME_ACCESS.metric_inc("requests_error")
+        RUNTIME_ACCESS.metric_inc("requests_timeout")
 
         add_error(ERROR_RUNTIME, request_id)
 
@@ -369,7 +365,7 @@ def finalize_request(
 
         add_error(error_class, request_id)
 
-        add_runtime_event(
+        RUNTIME_ACCESS.emit_event(
             "request_timeout",
             {"request_id":request_id}
         )
@@ -382,7 +378,7 @@ def finalize_request(
 
         track_error(request_id,error)
 
-        runtime.metric_inc("requests_error")
+        RUNTIME_ACCESS.metric_inc("requests_error")
 
         error_class = ERROR_CLASS_MAP.get(error, ERROR_RUNTIME)
 
@@ -400,7 +396,7 @@ def finalize_request(
 
         retry_reason = get_retry_reason(error_class)
 
-        add_runtime_event(
+        RUNTIME_ACCESS.emit_event(
 
             "request_failed",
 
@@ -430,23 +426,23 @@ def finalize_request(
     TOKENS_PER_SEC = tokens_per_sec
 
 
-    runtime.metric_set("tokens_per_sec",tokens_per_sec)
-    runtime.metric_set("tokens_last",tokens)
-    runtime.metric_set("last_duration",duration)
+    RUNTIME_ACCESS.metric_set("tokens_per_sec",tokens_per_sec)
+    RUNTIME_ACCESS.metric_set("tokens_last",tokens)
+    RUNTIME_ACCESS.metric_set("last_duration", duration)
 
 
-    total = runtime.metric_get("total_duration") or 0
+    total = RUNTIME_ACCESS.metric_get("total_duration") or 0
 
     total += duration
 
-    runtime.metric_set("total_duration", total)
+    RUNTIME_ACCESS.metric_set("total_duration", total)
 
 
-    count = runtime.metric_get("requests_success") or 0
+    count = RUNTIME_ACCESS.metric_get("requests_success") or 0
 
     if count > 0:
 
-        runtime.metric_set(
+        RUNTIME_ACCESS.metric_set(
             "avg_duration",
             total / count
         )
@@ -464,55 +460,13 @@ def finalize_request(
 
     )
 
-
-    if status == STATUS_FINISHED:
-
-        emit_event(
-            EVENT_REQUEST_FINISHED,
-            {"request_id":request_id}
-        )
-
-
-    elif status == STATUS_CANCELLED:
-
-        emit_event(
-            EVENT_REQUEST_CANCELLED,
-            {"request_id":request_id}
-        )
-
-
-    elif status == STATUS_ERROR:
-
-        emit_event(
-            EVENT_REQUEST_FAILED,
-            {"request_id":request_id}
-        )
-
-
-    elif status == STATUS_TIMEOUT:
-
-        emit_event(
-            EVENT_REQUEST_TIMEOUT,
-            {"request_id":request_id}
-        )
-
-    runtime.last_request = {
-
-        "request_id": request_id,
-        "status": status,
-        "duration": duration
-
-    }
-
-    runtime.last_request = {
-
+    RUNTIME_ACCESS.write("last_request", {
         "request_id": request_id,
         "status": status,
         "duration": duration,
         "tokens": tokens,
         "tokens_per_sec": tokens_per_sec
-
-    }
+    })
 
 
 # ENTRY POINT
@@ -531,8 +485,6 @@ def run_inference(
 
     tokens = 0
     tokens_per_sec = 0
-
-    runtime = get_runtime()
 
     model = get_model()
 

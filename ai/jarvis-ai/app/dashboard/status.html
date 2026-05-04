@@ -10,6 +10,16 @@ body{
     font-family:monospace;
 }
 
+.active{
+    color:#ff4d4d;
+    font-weight:bold;
+}
+
+.inactive{
+    color:#00ff9c;
+    opacity:0.6;
+}
+
 .box{
     border:1px solid #00ff9c;
     padding:10px;
@@ -34,6 +44,8 @@ body{
 <div id="performance" class="box"></div>
 <div id="history" class="box"></div>
 <div id="learning" class="box"></div>
+<div id="signals" class="box"></div>
+<div id="decision" class="box"></div>
 
 <script>
 
@@ -52,7 +64,11 @@ async function load(){
 
     try{
 
-        let r = await fetch("/status");
+        let url = window.location.origin + "/status";
+
+        console.log("FETCH URL:", url);
+
+        let r = await fetch(url);
         if(!r.ok) throw new Error("Status request failed");
 
         let d = await r.json();
@@ -60,17 +76,32 @@ async function load(){
         // ================= DATA =================
 
         let e = d.inference?.engine || {};
-        let intel = e.error_intelligence || {};
         let learning = e.learning || {};
 
         // ================= GLOBAL =================
 
-        let instability = intel.instability || "stable";
+        let signals = e.signals || [];
+
+        let highest = 0;
+
+        if(Array.isArray(signals)){
+            signals.forEach(s=>{
+                let lvl = s.level ?? 0;
+
+                if(lvl > highest) highest = lvl;
+
+            });
+        } else {
+            console.warn("signals not array:", signals);
+        }
+
+        "STATE: "+
+        (e.state ?? "unknown").toUpperCase()
 
         let errorCount = 0;
         if(e.error_types){
             errorCount = Object.values(e.error_types).reduce((a,b)=>a+b,0);
-        }
+            }
 
         // ================= GLOBAL =================
 
@@ -94,8 +125,8 @@ async function load(){
         if(el){
             el.innerHTML =
                 "<div class='box'><div class='title'>RUNTIME</div>"+
-                "STATE: "+(e.jarvis?.state ?? "unknown")+"<br>"+
-                "UPTIME: "+(e.jarvis?.uptime ?? 0)+"<br>"+
+                "STATE: "+(e.state ?? "unknown")+"<br>"+
+                "UPTIME: "+(e.uptime ?? 0)+"<br>"+
                 "BUSY: "+(e.busy ?? false)+"<br>"+
                 "WORKER: "+(e.worker_status ?? "unknown")+"<br>"+
                 "QUEUE: "+(e.queue ?? 0)+"/"+(e.queue_limit ?? 0)+"<br>"+
@@ -111,7 +142,7 @@ async function load(){
                 "ERRORS: "+errorCount+"<br>"+
                 "TIMEOUTS: "+(e.timeouts ?? 0)+"<br>"+
                 "SUCCESS: "+(e.success_requests ?? 0)+"<br>"+
-                "RISK: "+(intel.risk_level ?? "low")+"<br>"+
+                "SIGNAL LOAD: "+(highest ?? 0).toFixed(2)+"<br>"+
                 "</div>";
         }
 
@@ -179,17 +210,95 @@ async function load(){
             el.innerHTML = learning_html;
         }
 
+        // ================= SIGNALS =================
+
+        let signals_html = "<div class='box'><div class='title'>SIGNALS</div>";
+
+        if(Array.isArray(signals)){
+
+            signals.forEach(s=>{
+
+                signals_html +=
+                    s.type +
+                    " | lvl=" + (s.level ?? 0).toFixed(2) +
+                    " | trend=" + s.trend +
+                    "<br>";
+            });
+        } else {
+            console.warn("signals not array:", signals);
+        }
+
+        signals_html += "</div>";
+
+        let signals_el = document.getElementById("signals");
+        if(signals_el){
+            signals_el.innerHTML = signals_html;
+        }
+
+        // ================= DECISION =================
+
+        let decision_html = "<div class='box'><div class='title'>DECISION</div>";
+
+        let decision = e.decision;
+        let meta = decision?.meta || {};
+
+        let decision_history = e.decision_history || [];
+
+        if(decision.decision_type === "none"){
+            decision_html +=
+                "type: NONE<br>" +
+                "reason: " + (decision.reasoning ?? "n/a") + "<br>" +
+                "active: " + (meta.active ?? "?") + "/" + (meta.required ?? "?") + "<br>" +
+                "missing: " + ((meta.missing || []).join(", ") || "none") + "<br>";
+        }
+        else{
+            decision_html +=
+                "confidence: " + (decision.confidence ?? 0).toFixed(3) + "<br>" +
+                "priority: " + (decision.priority ?? 0) + "<br>" +
+                "reason: " + (decision.reasoning ?? "n/a") + "<br>" +
+
+                "base: " + (meta.base_confidence ?? "n/a") + "<br>" +
+                "adj: " + (meta.learning_adjustment ?? 0.0) + "<br>" +
+                "final: " + (meta.final_confidence ?? "n/a") + "<br>";
+        }
+
+        decision_html += "<br><b>HISTORY</b><br>";
+
+        if(Array.isArray(decision_history) && decision_history.length > 0){
+            decision_history.slice().reverse().forEach(d=>{
+                decision_html +=
+                    "type=" + (d.decision_type ?? "?") +
+                    " | c=" + (d.confidence ?? 0).toFixed(3) +
+                    " | p=" + (d.priority ?? 0) +
+                    "<br>";
+            });
+        } else {
+            decision_html += "no history<br>";
+        }
+
+decision_html += "</div>";
+
+        let decision_el = document.getElementById("decision");
+        if(decision_el){
+            decision_el.innerHTML = decision_html;
+        }
+
         } catch(err){
 
             console.error("Dashboard load failed:", err);
 
-            if(dashboardLoop){
-                clearInterval(dashboardLoop);
-                dashboardLoop = null;
-            }
+            // keep loop alive for recovery
 
-            document.body.innerHTML +=
-                "<div style='color:red'>DASHBOARD ERROR — AUTO REFRESH STOPPED</div>";
+            let errBox = document.getElementById("global_status");
+
+            if(errBox){
+                errBox.innerHTML =
+                    "<div class='title'>DASHBOARD ERROR</div>" +
+                    "<div style='color:red'>" +
+                    "message: " + err.message + "<br>" +
+                    "type: " + err.name +
+                    "</div>";
+            }
     }
 }
 

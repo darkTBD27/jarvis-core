@@ -1,14 +1,16 @@
+# VERIFY_MARKER: G6kfZa)c
+
 import queue
 import concurrent.futures
 import atexit
 import time
 import os
 
-from inference.runtime_state import *
-from inference.metrics import *
 from inference.events import emit_event
 
 from config.runtime_config import MAX_QUEUE_SIZE
+
+from engine.logger import logger
 
 
 REQUEST_QUEUE = queue.PriorityQueue(maxsize=MAX_QUEUE_SIZE)
@@ -27,11 +29,11 @@ def shutdown_executor():
 
         )
 
-        print("[Jarvis] Executor shutdown complete")
+        logger.info("[Jarvis] Executor shutdown complete")
 
     except Exception as e:
 
-        print("[Jarvis] Executor shutdown error:",e)
+        logger.info("[Jarvis] Executor shutdown error:",e)
 
 
 atexit.register(shutdown_executor)
@@ -46,32 +48,47 @@ def queue_size():
 
     return REQUEST_QUEUE.qsize()
 
-
+# PHASE 1: offizieller externer Eintrittspunkt in den produktiven Runtime-Pfad
+# Ab hier beginnt der kontrollierte Backbone-Eintritt (Queue-Eintrittspuffer)
 def enqueue_request(item):
-
     try:
-
         REQUEST_QUEUE.put(item)
+
+        request_id = None
+        if len(item) > 1 and len(item[1]) > 3:
+            request_id = item[1][3]
+
+        emit_event("queue_enqueue", {
+            "size": REQUEST_QUEUE.qsize(),
+            "request_id": request_id
+        })
 
         return True
 
     except Exception:
-
         return False
 
-
+# PHASE 1: exklusiver interner Übergabepunkt vom Eintrittspuffer in den Runtime-Kontrollpfad
+# Ab hier endet Queue-Pufferung und aktiver Runtime-Kontrollfluss beginnt
 def dequeue_request():
-
     try:
-
         if REQUEST_QUEUE.empty():
-
             return None
 
-        return REQUEST_QUEUE.get()
+        item = REQUEST_QUEUE.get()
+
+        request_id = None
+        if len(item) > 1 and len(item[1]) > 3:
+            request_id = item[1][3]
+
+        emit_event("queue_dequeue", {
+            "size": REQUEST_QUEUE.qsize(),
+            "request_id": request_id
+        })
+
+        return item
 
     except Exception:
-
         return None
 
 
@@ -80,13 +97,18 @@ def queue_empty():
     return REQUEST_QUEUE.empty()
 
 
+def _queue_items_snapshot():
+
+    return list(REQUEST_QUEUE.queue)
+
+
 def queued_ids():
 
     ids = []
 
     try:
 
-        items = list(REQUEST_QUEUE.queue)
+        items = _queue_items_snapshot()
 
         for item in items:
 
@@ -103,16 +125,6 @@ def queued_ids():
         return []
 
     return ids
-
-
-def get_queue():
-
-    return REQUEST_QUEUE
-
-
-def get_executor():
-
-    return EXECUTOR
 
 
 def get_queue_size():
@@ -139,3 +151,25 @@ def queue_pressure():
     except Exception:
 
         return 0
+
+
+def snapshot_queue():
+    try:
+        items = _queue_items_snapshot()
+
+        result = []
+
+        for item in items:
+            if len(item) > 1:
+                payload = item[1]
+
+                if len(payload) > 3:
+                    result.append({
+                        "priority": item[0],
+                        "request_id": payload[3]
+                    })
+
+        return result
+
+    except Exception:
+        return []

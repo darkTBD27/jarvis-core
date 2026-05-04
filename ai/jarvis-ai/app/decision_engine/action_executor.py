@@ -1,6 +1,10 @@
 import time
+
+from engine.logger import logger
 from inference.queue_system import get_queue_size
 
+# PHASE 7: determinismusrelevante Laufzeit-Vorbedingungen im Action-Pfad
+# Diese Runtime-Faktoren beeinflussen Action-Ausführung deterministisch und müssen als feste Kontrollparameter sichtbar bleiben
 current_worker_limit = 1
 MAX_WORKERS = 3
 
@@ -23,7 +27,7 @@ def execute_action(action):
     if not action:
         return
 
-    print(f"[ACTION] Executing: {action}")
+    logger.info(f"[ACTION] Executing: {action}")
 
     if action == "scale_queue":
 
@@ -31,46 +35,46 @@ def execute_action(action):
 
         # --- COOLDOWN ---
         if now - last_scale_time < SCALE_COOLDOWN:
-            print("[SCALING] cooldown active")
+            logger.info("[SCALING] cooldown active")
             return
 
         queue = get_queue_size()
 
-        print(f"[ACTION EXECUTOR] scale_queue | queue={queue}")
+        logger.info(f"[ACTION EXECUTOR] scale_queue | queue={queue}")
 
         if queue < 2:
-            print("[SCALING] queue too small → skip")
+            logger.info("[SCALING] queue too small → skip")
             return
 
         if current_worker_limit < MAX_WORKERS:
             current_worker_limit += 1
             last_scale_time = now
 
-            print(f"[SCALING] worker_limit increased to {current_worker_limit}")
+            logger.info(f"[SCALING] worker_limit increased to {current_worker_limit}")
 
             if runtime_worker:
                 runtime_worker.scale_workers()
             else:
-                print("[ERROR] runtime_worker not set")
+                logger.info("[ERROR] runtime_worker not set")
 
         else:
-            print("[SCALING] max workers reached")
+            logger.info("[SCALING] max workers reached")
 
     elif action == "scale_down":
 
-        print("[ACTION EXECUTOR] scale_down triggered")
+        logger.info("[ACTION EXECUTOR] scale_down triggered")
 
         if current_worker_limit > 1:
             current_worker_limit -= 1
-            print(f"[SCALING] worker_limit decreased to {current_worker_limit}")
+            logger.info(f"[SCALING] worker_limit decreased to {current_worker_limit}")
 
             if runtime_worker:
                 runtime_worker.scale_down()
             else:
-                print("[ERROR] runtime_worker not set")
+                logger.info("[ERROR] runtime_worker not set")
 
         else:
-            print("[SCALING] already at minimum workers")
+            logger.info("[SCALING] already at minimum workers")
 
     elif action == "restart_worker":
-        print("[ACTION EXECUTOR] restarting worker...")
+        logger.info("[ACTION EXECUTOR] restarting worker...")

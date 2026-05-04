@@ -2,17 +2,17 @@
 # RUNTIME INTELLIGENCE
 # ------------------------------------------------------------
 # Zweck:
-# Analysiert Runtime Zustand und erzeugt Signals
+# Analysiert Runtime Zustand und erzeugt PURE Signals
 #
 # INPUT:
-# Runtime State + Errors + Queue
+# Runtime State + Metrics + Errors
 #
 # OUTPUT:
-# Signals (keine Decisions, keine Actions!)
+# Signals (roh, ohne Interpretation)
 # ============================================================
 
 from inference.runtime_errors import get_recent_error_count
-from inference.runtime_object import get_runtime
+from inference.runtime_object import RUNTIME_ACCESS
 
 import time
 import logging
@@ -20,163 +20,138 @@ import logging
 logger = logging.getLogger("jarvis")
 
 # ============================================================
-# CONFIG
+# HELPER
 # ============================================================
 
-signal_memory = {}
+def clamp(x, min_v=0.0, max_v=1.0):
+    return max(min_v, min(max_v, x))
 
-SIGNAL_STABILITY_THRESHOLD = 2
-SIGNAL_WINDOW = 10  # Sekunden
+def normalize(value, min_v, max_v):
+    if max_v == min_v:
+        return 0.0
+    return clamp((value - min_v) / (max_v - min_v))
+
+def trend(current, previous, eps=1e-6):
+    diff = current - previous
+    if abs(diff) < eps:
+        return 0
+    return 1 if diff > 0 else -1
 
 # ============================================================
-# ANALYSIS LAYER
+# SIGNAL DETECTORS (PURE)
 # ============================================================
 
-def analyze_error_patterns():
+def detect_queue_pressure(queue, queue_prev):
+
+    level = normalize(queue, 0, 50)
+    trend_dir = trend(queue, queue_prev)
+
     return {
-        "last_minute": get_recent_error_count(60),
-        "last_5_minutes": get_recent_error_count(300)
+        "type": "QUEUE_PRESSURE",
+        "value": queue,
+        "trend": trend_dir,
+        "level": level,
+        "timestamp": time.time()
     }
 
 
-def calculate_stability_score():
-    errors = get_recent_error_count(60)
+def detect_request_rate(rate, rate_prev):
 
-    if errors == 0:
-        return 100
-    if errors < 3:
-        return 85
-    if errors < 6:
-        return 70
-    if errors < 10:
-        return 50
+    level = normalize(rate, 0, 20)
+    trend_dir = trend(rate, rate_prev)
 
-    return 25
-
-
-def detect_runtime_risk():
-    errors = get_recent_error_count(60)
-
-    if errors > 8:
-        return "high"
-    if errors > 3:
-        return "medium"
-
-    return "low"
-
-
-def detect_error_trend():
-    last_min = get_recent_error_count(60)
-    last_5min = get_recent_error_count(300)
-
-    if last_min > last_5min / 5:
-        return "increasing"
-
-    if last_min < last_5min / 10:
-        return "decreasing"
-
-    return "stable"
-
-
-def detect_instability(trend):
-    errors = get_recent_error_count(60)
-
-    if errors > 8:
-        return "critical"
-
-    if trend == "increasing" and errors > 3:
-        return "warning"
-
-    return "stable"
-
-# ============================================================
-# SIGNAL CORE
-# ============================================================
-
-def create_signal(signal_type):
-
-    now = time.time()
-
-    entries = signal_memory.get(signal_type, [])
-    entries = [t for t in entries if now - t < SIGNAL_WINDOW]
-
-    entries.append(now)
-    signal_memory[signal_type] = entries
-
-    stable = len(entries) >= SIGNAL_STABILITY_THRESHOLD
-
-    signal = {
-        "type": signal_type,
-        "timestamp": now,
-        "source": "runtime_intelligence",
-        "stable": stable
+    return {
+        "type": "REQUEST_RATE",
+        "value": rate,
+        "trend": trend_dir,
+        "level": level,
+        "timestamp": time.time()
     }
 
-    logger.info(f"[SIGNAL] {signal_type} stable={stable}")
 
-    return signal
+def detect_latency(latency, latency_prev):
+
+    level = normalize(latency, 0, 10)
+    trend_dir = trend(latency, latency_prev)
+
+    return {
+        "type": "LATENCY",
+        "value": latency,
+        "trend": trend_dir,
+        "level": level,
+        "timestamp": time.time()
+    }
+
+
+def detect_error_rate(error_rate, error_prev):
+
+    level = normalize(error_rate, 0.0, 0.5)
+    trend_dir = trend(error_rate, error_prev)
+
+    return {
+        "type": "ERROR_RATE",
+        "value": error_rate,
+        "trend": trend_dir,
+        "level": level,
+        "timestamp": time.time()
+    }
 
 
 # ============================================================
-# SIGNAL DETECTORS
+# SIGNAL GENERATION (STATELESS + PURE)
 # ============================================================
 
-def detect_queue_pressure(queue_size):
-    if queue_size > 2:
-        return create_signal("QUEUE_PRESSURE")
-    return None
+def generate_runtime_signals(runtime):
 
-
-# ============================================================
-# SIGNAL GENERATION
-# ============================================================
-
-def generate_runtime_signals(runtime, intelligence):
+    from inference.queue_system import queue_size as get_queue_size
 
     signals = []
 
-    queue = runtime.queue_size
-    worker = runtime.get_worker_status()
+    # --- CURRENT VALUES ---
+    queue = get_queue_size()
+    latency = runtime.metric_get("avg_duration")
+    requests_total = runtime.metric_get("requests_total")
+    errors = get_recent_error_count(60)
 
-    # --- QUEUE ---
-    queue_signal = detect_queue_pressure(queue)
-    if queue_signal:
-        signals.append(queue_signal)
+    # --- ERROR RATE ---
+    if requests_total > 0:
+        error_rate = errors / requests_total
+    else:
+        error_rate = 0.0
 
-    # --- WORKER ---
-    if worker == "stalled":
-        signals.append(create_signal("WORKER_STALLED"))
+    # --- PREVIOUS VALUES ---
+    prev = getattr(runtime, "_prev_metrics", {})
 
-    # --- LOAD ---
-    if runtime.is_busy() and queue > 3:
-        signals.append(create_signal("RUNTIME_OVERLOAD"))
+    queue_prev = prev.get("queue", queue)
+    latency_prev = prev.get("latency", latency)
+    rate_prev = prev.get("rate", 0)
+    error_prev = prev.get("error_rate", error_rate)
 
-    # --- IDLE ---
-    if not runtime.is_busy() and queue == 0:
-        signals.append(create_signal("RUNTIME_IDLE"))
+    # --- REQUEST RATE ---
+    last_total = prev.get("requests_total", requests_total)
+    delta = requests_total - last_total
+    rate = max(delta, 0)
 
-    # --- RISK ---
-    if intelligence["risk_level"] == "high":
-        signals.append(create_signal("RUNTIME_RISK_HIGH"))
+    # ========================================================
+    # SIGNALS (ONLY PURE)
+    # ========================================================
 
-    # --- INSTABILITY ---
-    if intelligence["instability"] == "critical":
-        signals.append(create_signal("RUNTIME_INSTABILITY"))
+    signals.append(detect_queue_pressure(queue, queue_prev))
+    signals.append(detect_request_rate(rate, rate_prev))
+    signals.append(detect_latency(latency, latency_prev))
+    signals.append(detect_error_rate(error_rate, error_prev))
 
-    # --- TREND ---
-    if intelligence["error_trend"] == "increasing":
-        signals.append(create_signal("ERROR_TREND_UP"))
+    # ========================================================
+    # SAVE PREVIOUS STATE (IN RUNTIME → allowed)
+    # ========================================================
 
-    elif intelligence["error_trend"] == "decreasing":
-        signals.append(create_signal("ERROR_RECOVERY"))
-
-    # --- STABILITY DROP ---
-    if intelligence["stability_score"] < 60:
-        signals.append(create_signal("STABILITY_DROP"))
-
-    # --- FALLBACK ---
-    if not signals:
-        signals.append(create_signal("RUNTIME_IDLE"))
+    runtime._prev_metrics = {
+        "queue": queue,
+        "latency": latency,
+        "rate": rate,
+        "error_rate": error_rate,
+        "requests_total": requests_total
+    }
 
     return signals
 
@@ -189,22 +164,16 @@ def get_runtime_intelligence():
 
     runtime = get_runtime()
 
-    trend = detect_error_trend()
+    signals = generate_runtime_signals(runtime)
 
-    intelligence = {
-        "error_patterns": analyze_error_patterns(),
-        "stability_score": calculate_stability_score(),
-        "risk_level": detect_runtime_risk(),
-        "error_trend": trend,
-        "instability": detect_instability(trend)
+    # --- OBSERVABILITY ---
+    logger.info(f"[SIGNALS RAW] {signals}")
+
+    runtime.add_signal_history({
+        "signals": signals,
+        "time": time.time()
+    })
+
+    return {
+        "signals": signals
     }
-
-    signals = generate_runtime_signals(runtime, intelligence)
-
-    runtime.add_signal_history(signals)
-
-    intelligence["signals"] = signals
-
-    logger.info(f"[INTELLIGENCE] signals={len(signals)}")
-
-    return intelligence

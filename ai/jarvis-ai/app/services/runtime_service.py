@@ -1,19 +1,23 @@
-from inference.queue_system import enqueue_request
+# VERIFY_MARKER: VRHM3{zQ
 
-from inference.runtime_object import get_runtime
+from inference.queue_system import enqueue_request
 
 import uuid
 
-
+# PHASE 5: externer Service-Einstieg oberhalb des Runtime-Kerns
+# Service darf Requests einspeisen, bleibt aber isolierter Aufrufer außerhalb des Runtime-Kontrollpfads
 def run(prompt, request_id=None):
 
     if not request_id:
 
         request_id = str(uuid.uuid4())
 
-    runtime = get_runtime()
+    from inference.events import emit_event
 
-    runtime.metric_inc("requests_total")
+    emit_event("runtime_run_requested", {
+        "request_id": request_id,
+        "mode": "manual_observation"
+    })
 
     enqueue_request(
 
@@ -44,52 +48,3 @@ def run(prompt, request_id=None):
         "request_id": request_id
 
     }
-
-
-# TODO Phase 3 Execution Intelligence
-
-#def cancel(request_id):
-
-    #cancel_request(request_id)
-
-    #return {
-
-        #"error":False,
-
-        #"data":{
-
-            #"cancelled":request_id
-
-        #}
-
-    #}
-
-
-# TODO Phase 3 Execution Intelligence
-
-#def retry(request_id):
-
-    #result = retry_request(request_id)
-
-    #return {
-
-        #"error":result.get("error",False),
-
-        #"data":result
-
-    #}
-
-
-# TODO Phase 3 Execution Intelligence
-
-#def request(request_id):
-
-    #data = get_request_status(request_id)
-
-    #return {
-
-        #"error":False,
-
-        #"data":data
-
-    #}
